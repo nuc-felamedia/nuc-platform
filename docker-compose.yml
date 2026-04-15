@@ -1,0 +1,65 @@
+# docker-compose.yml
+# Run the entire NUC Platform locally with one command:
+# docker-compose up -d
+
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: nuc_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: nuc_user
+      POSTGRES_PASSWORD: nuc_password_local
+      POSTGRES_DB: nuc_platform
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    container_name: nuc_redis
+    restart: unless-stopped
+    ports:
+      - '6379:6379'
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: nuc_backend
+    restart: unless-stopped
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+      DATABASE_URL: postgresql://nuc_user:nuc_password_local@postgres:5432/nuc_platform
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: change_this_to_a_random_64_char_string
+      JWT_REFRESH_SECRET: change_this_to_another_random_64_char_string
+      FRONTEND_URL: http://localhost:3000
+    ports:
+      - '5000:5000'
+    volumes:
+      - ./backend/logs:/app/logs
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: nuc_frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:5000
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+    ports:
+      - '3000:3000'
+
+volumes:
+  postgres_data:

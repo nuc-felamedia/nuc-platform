@@ -1,0 +1,361 @@
+// prisma/schema.prisma
+// NUC Accreditation Platform — Complete Database Schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────
+// ENUMS
+// ─────────────────────────────────────────────
+
+enum UniversityType {
+  FEDERAL
+  STATE
+  PRIVATE
+  TRANSNATIONAL
+  DISTANCE_LEARNING
+  AFFILIATED
+}
+
+enum AccreditationStatus {
+  FULL
+  INTERIM
+  DENIED
+  PENDING
+  NOT_YET_ACCREDITED
+}
+
+enum DegreeType {
+  BSC
+  BA
+  BENG
+  BTECH
+  LLB
+  MBBS
+  BPHARM
+  MSC
+  MA
+  MBA
+  MENG
+  LLM
+  PHD
+  HND
+  OND
+  OTHER
+}
+
+enum UserRole {
+  PUBLIC
+  SUBSCRIBER
+  UNIVERSITY_ADMIN
+  NUC_STAFF
+  SUPER_ADMIN
+}
+
+enum PostType {
+  NEWS
+  BULLETIN
+  PRESS_RELEASE
+  CIRCULAR
+  ANNOUNCEMENT
+}
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum DocumentCategory {
+  GUIDELINE
+  REPORT
+  STATISTICAL_DIGEST
+  POLICY
+  CIRCULAR
+  OTHER
+}
+
+// ─────────────────────────────────────────────
+// USER
+// ─────────────────────────────────────────────
+
+model User {
+  id                String    @id @default(cuid())
+  email             String    @unique
+  password          String
+  firstName         String
+  lastName          String
+  role              UserRole  @default(PUBLIC)
+  isVerified        Boolean   @default(false)
+  isActive          Boolean   @default(true)
+  verificationToken String?
+  resetToken        String?
+  resetTokenExpiry  DateTime?
+  lastLogin         DateTime?
+  universityId      String?
+  university        University? @relation(fields: [universityId], references: [id])
+  subscription      Subscription?
+  apiKeys           ApiKey[]
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@index([email])
+  @@index([role])
+}
+
+// ─────────────────────────────────────────────
+// SUBSCRIPTION
+// ─────────────────────────────────────────────
+
+model Subscription {
+  id           String   @id @default(cuid())
+  userId       String   @unique
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan         String   // FREE, PRO, INSTITUTIONAL, NUC_STAFF
+  status       String   // ACTIVE, CANCELLED, EXPIRED
+  paystackRef  String?
+  startDate    DateTime @default(now())
+  endDate      DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model ApiKey {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  name        String
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  callsToday  Int      @default(0)
+  totalCalls  Int      @default(0)
+  lastUsed    DateTime?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  @@index([key])
+}
+
+// ─────────────────────────────────────────────
+// UNIVERSITY
+// ─────────────────────────────────────────────
+
+model University {
+  id               String         @id @default(cuid())
+  name             String
+  slug             String         @unique
+  abbreviation     String?
+  type             UniversityType
+  state            String
+  city             String?
+  address          String?
+  website          String?
+  email            String?
+  phone            String?
+  logoUrl          String?
+  description      String?
+  vision           String?
+  mission          String?
+  yearEstablished  Int?
+  vcName           String?
+  vcEmail          String?
+  campusSize       String?
+  studentPop       String?
+  nucApprovalYear  Int?
+  isActive         Boolean        @default(true)
+  programs         Program[]
+  users            User[]
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  @@index([slug])
+  @@index([type])
+  @@index([state])
+}
+
+// ─────────────────────────────────────────────
+// FACULTY
+// ─────────────────────────────────────────────
+
+model Faculty {
+  id           String    @id @default(cuid())
+  name         String
+  slug         String    @unique
+  programs     Program[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+// ─────────────────────────────────────────────
+// PROGRAM
+// ─────────────────────────────────────────────
+
+model Program {
+  id             String    @id @default(cuid())
+  name           String
+  slug           String
+  universityId   String
+  university     University @relation(fields: [universityId], references: [id], onDelete: Cascade)
+  facultyId      String?
+  faculty        Faculty?   @relation(fields: [facultyId], references: [id])
+  degreeType     DegreeType
+  duration       Int?       // years
+  description    String?
+  isActive       Boolean    @default(true)
+  accreditations Accreditation[]
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  @@unique([universityId, slug])
+  @@index([universityId])
+  @@index([facultyId])
+}
+
+// ─────────────────────────────────────────────
+// ACCREDITATION
+// ─────────────────────────────────────────────
+
+model Accreditation {
+  id           String              @id @default(cuid())
+  programId    String
+  program      Program             @relation(fields: [programId], references: [id], onDelete: Cascade)
+  status       AccreditationStatus
+  year         Int
+  expiryDate   DateTime?
+  notes        String?
+  visitDate    DateTime?
+  panelReport  String?             // URL to report PDF
+  isCurrent    Boolean             @default(true)
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+
+  @@index([programId])
+  @@index([status])
+  @@index([year])
+  @@index([isCurrent])
+}
+
+// ─────────────────────────────────────────────
+// DIRECTORATE
+// ─────────────────────────────────────────────
+
+model Directorate {
+  id          String     @id @default(cuid())
+  name        String
+  slug        String     @unique
+  description String?
+  mandate     String?
+  vision      String?
+  directorName String?
+  directorTitle String?
+  directorEmail String?
+  directorPhotoUrl String?
+  order       Int        @default(0)
+  isActive    Boolean    @default(true)
+  divisions   Division[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model Division {
+  id             String      @id @default(cuid())
+  name           String
+  slug           String
+  directorateId  String
+  directorate    Directorate @relation(fields: [directorateId], references: [id], onDelete: Cascade)
+  description    String?
+  headName       String?
+  headTitle      String?
+  headEmail      String?
+  order          Int         @default(0)
+  staff          Staff[]
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  @@unique([directorateId, slug])
+}
+
+model Staff {
+  id         String   @id @default(cuid())
+  name       String
+  title      String?
+  email      String?
+  phone      String?
+  photoUrl   String?
+  divisionId String
+  division   Division @relation(fields: [divisionId], references: [id], onDelete: Cascade)
+  order      Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+// ─────────────────────────────────────────────
+// POSTS (News, Bulletins, Announcements)
+// ─────────────────────────────────────────────
+
+model Post {
+  id          String     @id @default(cuid())
+  title       String
+  slug        String     @unique
+  excerpt     String?
+  content     String
+  type        PostType   @default(NEWS)
+  status      PostStatus @default(DRAFT)
+  featuredImage String?
+  authorName  String?
+  publishedAt DateTime?
+  tags        String[]
+  viewCount   Int        @default(0)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@index([slug])
+  @@index([type])
+  @@index([status])
+  @@index([publishedAt])
+}
+
+// ─────────────────────────────────────────────
+// DOCUMENTS (Guidelines, Statistical Digests)
+// ─────────────────────────────────────────────
+
+model Document {
+  id          String           @id @default(cuid())
+  title       String
+  slug        String           @unique
+  description String?
+  category    DocumentCategory
+  fileUrl     String
+  fileName    String
+  fileSize    Int?
+  year        Int?
+  isPublic    Boolean          @default(true)
+  downloadCount Int            @default(0)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@index([category])
+  @@index([year])
+}
+
+// ─────────────────────────────────────────────
+// STATS (cached platform statistics)
+// ─────────────────────────────────────────────
+
+model PlatformStat {
+  id                 String   @id @default(cuid())
+  totalUniversities  Int      @default(0)
+  federalCount       Int      @default(0)
+  stateCount         Int      @default(0)
+  privateCount       Int      @default(0)
+  transnationalCount Int      @default(0)
+  totalPrograms      Int      @default(0)
+  accreditedPrograms Int      @default(0)
+  pendingPrograms    Int      @default(0)
+  updatedAt          DateTime @updatedAt
+}
