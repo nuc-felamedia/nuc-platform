@@ -8,21 +8,21 @@ export interface TokenPayload {
 }
 
 export function generateAccessToken(payload: TokenPayload): string {
-  return jwt.sign(payload, process.env.JWT_SECRET!, {
-    expiresIn: process.env.JWT_EXPIRES_IN || '15m',
-  })
+  return jwt.sign(payload, process.env.JWT_SECRET as string, {
+    expiresIn: '15m',
+  } as jwt.SignOptions)
 }
 
 export function generateRefreshToken(payload: TokenPayload): string {
-  return jwt.sign(payload, process.env.JWT_REFRESH_SECRET!, {
-    expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d',
-  })
+  return jwt.sign(payload, process.env.JWT_REFRESH_SECRET as string, {
+    expiresIn: '7d',
+  } as jwt.SignOptions)
 }
 
 export function verifyAccessToken(token: string): TokenPayload {
-  return jwt.verify(token, process.env.JWT_SECRET!) as TokenPayload
+  return jwt.verify(token, process.env.JWT_SECRET as string) as TokenPayload
 }
 
 export function verifyRefreshToken(token: string): TokenPayload {
-  return jwt.verify(token, process.env.JWT_REFRESH_SECRET!) as TokenPayload
+  return jwt.verify(token, process.env.JWT_REFRESH_SECRET as string) as TokenPayload
 }
