@@ -114,4 +114,6 @@ async function runSeed() {
     await db.$disconnect()
   } catch(e) { console.error('Seed error:', e); await db.$disconnect() }
 }
-runSeed()
+if (process.env.NODE_ENV !== 'production') {
+  runSeed()
+}
