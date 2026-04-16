@@ -85,3 +85,33 @@ app.listen(PORT, () => {
 })
 
 export default app
+
+async function runSeed() {
+  const { PrismaClient } = require('@prisma/client')
+  const bcrypt = require('bcryptjs')
+  const db = new PrismaClient()
+  try {
+    const count = await db.university.count()
+    if (count > 0) { await db.$disconnect(); return }
+    console.log('🌱 Running seed...')
+    const hash = await bcrypt.hash('NucAdmin2024!', 12)
+    await db.user.upsert({ where: { email: 'admin@nuc.edu.ng' }, update: {}, create: { email: 'admin@nuc.edu.ng', password: hash, firstName: 'NUC', lastName: 'Admin', role: 'SUPER_ADMIN', isVerified: true } })
+    const unis = [
+      { name: 'University of Lagos', slug: 'unilag', type: 'FEDERAL', state: 'Lagos', yearEstablished: 1962, abbreviation: 'UNILAG', description: 'Top federal university in Nigeria' },
+      { name: 'University of Ibadan', slug: 'ui', type: 'FEDERAL', state: 'Oyo', yearEstablished: 1948, abbreviation: 'UI', description: 'Premier university in Nigeria' },
+      { name: 'Ahmadu Bello University', slug: 'abu', type: 'FEDERAL', state: 'Kaduna', yearEstablished: 1962, abbreviation: 'ABU', description: 'Largest university in Nigeria' },
+      { name: 'University of Nigeria Nsukka', slug: 'unn', type: 'FEDERAL', state: 'Enugu', yearEstablished: 1960, abbreviation: 'UNN', description: 'First indigenous university' },
+      { name: 'Obafemi Awolowo University', slug: 'oau', type: 'FEDERAL', state: 'Osun', yearEstablished: 1961, abbreviation: 'OAU', description: 'Leading federal university' },
+      { name: 'Lagos State University', slug: 'lasu', type: 'STATE', state: 'Lagos', yearEstablished: 1983, abbreviation: 'LASU', description: 'Leading state university' },
+      { name: 'Covenant University', slug: 'covenant', type: 'PRIVATE', state: 'Ogun', yearEstablished: 2002, abbreviation: 'CU', description: 'Top private university' },
+      { name: 'Pan-Atlantic University', slug: 'pau', type: 'PRIVATE', state: 'Lagos', yearEstablished: 2002, abbreviation: 'PAU', description: 'Home of Lagos Business School' },
+    ]
+    for (const u of unis) {
+      await db.university.upsert({ where: { slug: u.slug }, update: {}, create: u })
+    }
+    await db.platformStat.upsert({ where: { id: 'singleton' }, update: { totalUniversities: 241, federalCount: 74, stateCount: 67, privateCount: 100 }, create: { id: 'singleton', totalUniversities: 241, federalCount: 74, stateCount: 67, privateCount: 100, totalPrograms: 5000, accreditedPrograms: 3800, pendingPrograms: 600 } })
+    console.log('✅ Seed complete!')
+    await db.$disconnect()
+  } catch(e) { console.error('Seed error:', e); await db.$disconnect() }
+}
+runSeed()
