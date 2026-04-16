@@ -116,3 +116,63 @@ export async function checkAccreditation(req: Request, res: Response) {
     isAccredited: current?.status === 'FULL',
   })
 }
+// ─────────────────────────────────────────────────────────────────────────────
+// ADD THIS FUNCTION to the bottom of:
+// backend/src/controllers/accreditation.controller.ts
+// ─────────────────────────────────────────────────────────────────────────────
+
+export async function getProgramHistory(req: Request, res: Response) {
+  try {
+    const { programId } = req.params
+
+    const program = await prisma.program.findUnique({
+      where: { id: programId },
+      include: {
+        university: {
+          select: { id: true, name: true, slug: true, type: true, state: true },
+        },
+        faculty: { select: { name: true } },
+      },
+    })
+
+    if (!program) return errorResponse(res, 'Program not found', 404)
+
+    const history = await prisma.accreditation.findMany({
+      where: { programId },
+      orderBy: { year: 'asc' },
+      select: {
+        id: true, status: true, year: true,
+        expiryDate: true, isCurrent: true, notes: true,
+      },
+    })
+
+    const related = await prisma.program.findMany({
+      where: {
+        universityId: program.universityId,
+        isActive: true,
+        id: { not: programId },
+      },
+      take: 6,
+      select: {
+        id: true, name: true, degreeType: true,
+        accreditations: {
+          where: { isCurrent: true },
+          select: { status: true, year: true },
+        },
+      },
+    })
+
+    const stats = {
+      total: history.length,
+      full: history.filter(h => h.status === 'FULL').length,
+      interim: history.filter(h => h.status === 'INTERIM').length,
+      denied: history.filter(h => h.status === 'DENIED').length,
+      firstYear: history[0]?.year ?? null,
+      lastYear: history[history.length - 1]?.year ?? null,
+    }
+
+    return successResponse(res, { program, history, related, stats })
+  } catch (error) {
+    return errorResponse(res, 'Failed to fetch program history', 500)
+  }
+}
