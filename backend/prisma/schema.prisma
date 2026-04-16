@@ -2,6 +2,7 @@
 // NUC Accreditation Platform — Complete Database Schema
 
 generator client {
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
   provider = "prisma-client-js"
 }
 
