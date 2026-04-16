@@ -50,10 +50,12 @@ const limiter = rateLimit({
 app.use('/api/', limiter)
 
 // ── Middleware ──
+app.set("trust proxy", 1)
 app.use(compression())
 app.use(express.json({ limit: '10mb' }))
 app.use(express.urlencoded({ extended: true, limit: '10mb' }))
 app.use(cookieParser())
+app.set("trust proxy", 1)
 app.use(morgan('combined', { stream: { write: (msg) => logger.http(msg.trim()) } }))
 
 // ── Health check ──
