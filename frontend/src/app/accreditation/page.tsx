@@ -182,7 +182,10 @@ export default function AccreditationPage() {
                       {record.notes && (
                         <div className="bg-blue-50 rounded-xl p-3 mb-4 text-sm text-blue-800">{record.notes}</div>
                       )}
-                      <div className="flex gap-3">
+                      <div className="flex gap-3 flex-wrap">
+                        <Link href={`/accreditation/program/${prog?.id}`}>
+                          <Button variant="primary" size="sm">View full history →</Button>
+                        </Link>
                         <Link href={`/universities/${uni?.slug}`}>
                           <Button variant="outline" size="sm">View university →</Button>
                         </Link>
