@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { CheckCircle2, XCircle, Clock, AlertCircle, Search } from 'lucide-react'
 import PublicLayout from '@/components/layout/PublicLayout'
 import { cn } from '@/lib/utils'
-import { universitiesApi, accreditationApi } from '@/lib/api'
+import { universitiesApi, accreditationApi, programsApi } from '@/lib/api'
 import Link from 'next/link'
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'https://nuc-platform-production.up.railway.app'
@@ -144,36 +144,47 @@ export default function VerifyPage() {
     return () => clearTimeout(timer)
   }, [uniQuery])
 
-  // Program autocomplete — filtered by selected university
+  // Cache programs when university is selected
+  useEffect(() => {
+    if (!selectedUni?.slug) { setUniPrograms([]); return }
+    universitiesApi.getOne(selectedUni.slug).then(res => {
+      setUniPrograms(res.data?.data?.programs || [])
+    }).catch(() => setUniPrograms([]))
+  }, [selectedUni])
+
+  // Program autocomplete — filter cached programs by query
   useEffect(() => {
     if (progQuery.length < 2) { setProgSuggestions([]); return }
-    setProgLoading(true)
-    const timer = setTimeout(async () => {
-      try {
-        const params: any = { q: progQuery, limit: 12 }
-        if (selectedUni) params.universityId = selectedUni.id
-        const res = await accreditationApi.getAll(params)
+    const source = uniPrograms.length > 0 ? uniPrograms : []
+    if (uniPrograms.length > 0) {
+      // Filter from cached university programs
+      const filtered = source
+        .filter((p: any) => p.name.toLowerCase().includes(progQuery.toLowerCase()))
+        .slice(0, 12)
+        .map((p: any) => ({
+          id: p.id,
+          label: p.name,
+          sub: [p.faculty?.name, p.degreeType, p.accreditations?.[0]?.status].filter(Boolean).join(' · '),
+        }))
+      setProgSuggestions(filtered)
+    } else {
+      // No university selected — search across all via accreditation API
+      setProgLoading(true)
+      accreditationApi.getAll({ q: progQuery, limit: 12 }).then(res => {
         const records = res.data?.data?.data || []
         const seen = new Set()
         const suggestions = records
-          .filter((r: any) => {
-            const key = r.program?.id
-            if (!key || seen.has(key)) return false
-            seen.add(key)
-            return true
-          })
+          .filter((r: any) => { const k = r.program?.id; if (!k || seen.has(k)) return false; seen.add(k); return true })
           .map((r: any) => ({
             id: r.program?.id,
             label: r.program?.name,
-            sub: [r.program?.faculty?.name, r.program?.degreeType, r.status].filter(Boolean).join(' · '),
-            status: r.status,
+            sub: [r.program?.university?.name, r.program?.degreeType, r.status].filter(Boolean).join(' · '),
           }))
         setProgSuggestions(suggestions)
-      } catch { setProgSuggestions([]) }
-      finally { setProgLoading(false) }
-    }, 250)
-    return () => clearTimeout(timer)
-  }, [progQuery, selectedUni])
+      }).catch(() => setProgSuggestions([]))
+        .finally(() => setProgLoading(false))
+    }
+  }, [progQuery, uniPrograms])
 
   async function handleCheck() {
     if (!selectedProg?.id) return
