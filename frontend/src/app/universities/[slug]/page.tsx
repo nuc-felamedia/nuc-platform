@@ -135,6 +135,7 @@ export default async function UniversityDetailPage({ params }: { params: { slug:
                     <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Degree</th>
                     <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Status</th>
                     <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide hidden md:table-cell">Expires</th>
+                    <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">History</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -152,6 +153,14 @@ export default async function UniversityDetailPage({ params }: { params: { slug:
                         </td>
                         <td className="px-5 py-3.5 text-gray-400 text-xs hidden md:table-cell">
                           {acc?.expiryDate ? new Date(acc.expiryDate).getFullYear() : '—'}
+                        </td>
+                        <td className="px-5 py-3.5">
+                          <Link
+                            href={`/accreditation/program/${program.id}`}
+                            className="text-xs font-semibold text-brand-600 hover:text-brand-700 transition-colors whitespace-nowrap"
+                          >
+                            View history →
+                          </Link>
                         </td>
                       </tr>
                     )
