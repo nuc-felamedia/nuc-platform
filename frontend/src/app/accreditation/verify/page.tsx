@@ -121,7 +121,8 @@ export default function VerifyPage() {
   const [progSuggestions, setProgSuggestions] = useState<any[]>([])
   const [progLoading, setProgLoading]   = useState(false)
 
-  const [result, setResult]     = useState<any>(null)
+  const [uniPrograms, setUniPrograms] = useState<any[]>([])
+  const [result, setResult] = useState<any>(null)
   const [checking, setChecking] = useState(false)
   const [notFound, setNotFound] = useState(false)
 
