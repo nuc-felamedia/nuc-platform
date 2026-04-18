@@ -1,16 +1,14 @@
 'use client'
-// src/app/accreditation/verify/page.tsx
 import { useState, useEffect, useRef } from 'react'
 import { CheckCircle2, XCircle, Clock, AlertCircle, Search } from 'lucide-react'
 import PublicLayout from '@/components/layout/PublicLayout'
-import { cn } from '@/lib/utils'
-import { universitiesApi, accreditationApi, programsApi } from '@/lib/api'
+import { universitiesApi, accreditationApi } from '@/lib/api'
 import Link from 'next/link'
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'https://nuc-platform-production.up.railway.app'
 
 function AutocompleteInput({
-  label, placeholder, value, onChange, suggestions, onSelect, loading, disabled
+  label, placeholder, value, onChange, suggestions, onSelect, loading
 }: {
   label: string
   placeholder: string
@@ -19,7 +17,6 @@ function AutocompleteInput({
   suggestions: { id: string; label: string; sub?: string }[]
   onSelect: (item: { id: string; label: string; sub?: string }) => void
   loading?: boolean
-  disabled?: boolean
 }) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
@@ -42,15 +39,13 @@ function AutocompleteInput({
           type="text"
           placeholder={placeholder}
           value={value}
-          disabled={disabled}
           onChange={e => { onChange(e.target.value); setOpen(true) }}
           onFocus={() => value.length >= 2 && setOpen(true)}
           style={{
             width: '100%', padding: '12px 40px 12px 14px',
             border: '1.5px solid #e5e7eb', borderRadius: 10,
             fontSize: 14, color: '#111827', outline: 'none',
-            boxSizing: 'border-box', background: disabled ? '#f9fafb' : '#fff',
-            transition: 'border-color .15s',
+            boxSizing: 'border-box', background: '#fff',
           }}
         />
         {loading ? (
@@ -111,18 +106,18 @@ const STATUS_CONFIG: Record<string, { icon: any; title: string; desc: string; bg
 }
 
 export default function VerifyPage() {
-  const [uniQuery, setUniQuery]         = useState('')
-  const [selectedUni, setSelectedUni]   = useState<any>(null)
+  const [uniQuery, setUniQuery]             = useState('')
+  const [selectedUni, setSelectedUni]       = useState<any>(null)
   const [uniSuggestions, setUniSuggestions] = useState<any[]>([])
-  const [uniLoading, setUniLoading]     = useState(false)
+  const [uniLoading, setUniLoading]         = useState(false)
+  const [uniPrograms, setUniPrograms]       = useState<any[]>([])
 
-  const [progQuery, setProgQuery]       = useState('')
-  const [selectedProg, setSelectedProg] = useState<any>(null)
+  const [progQuery, setProgQuery]           = useState('')
+  const [selectedProg, setSelectedProg]     = useState<any>(null)
   const [progSuggestions, setProgSuggestions] = useState<any[]>([])
-  const [progLoading, setProgLoading]   = useState(false)
+  const [progLoading, setProgLoading]       = useState(false)
 
-  const [uniPrograms, setUniPrograms] = useState<any[]>([])
-  const [result, setResult] = useState<any>(null)
+  const [result, setResult]     = useState<any>(null)
   const [checking, setChecking] = useState(false)
   const [notFound, setNotFound] = useState(false)
 
@@ -145,7 +140,7 @@ export default function VerifyPage() {
     return () => clearTimeout(timer)
   }, [uniQuery])
 
-  // Cache programs when university is selected
+  // Load programs when university selected
   useEffect(() => {
     if (!selectedUni?.slug) { setUniPrograms([]); return }
     universitiesApi.getOne(selectedUni.slug).then(res => {
@@ -153,13 +148,13 @@ export default function VerifyPage() {
     }).catch(() => setUniPrograms([]))
   }, [selectedUni])
 
-  // Program autocomplete — filter cached programs by query
+  // Program autocomplete
   useEffect(() => {
     if (progQuery.length < 2) { setProgSuggestions([]); return }
-    const source = uniPrograms.length > 0 ? uniPrograms : []
+
     if (uniPrograms.length > 0) {
-      // Filter from cached university programs
-      const filtered = source
+      // Filter locally from the university's programs
+      const filtered = uniPrograms
         .filter((p: any) => p.name.toLowerCase().includes(progQuery.toLowerCase()))
         .slice(0, 12)
         .map((p: any) => ({
@@ -169,13 +164,18 @@ export default function VerifyPage() {
         }))
       setProgSuggestions(filtered)
     } else {
-      // No university selected — search across all via accreditation API
+      // Search across all programs via accreditation API
       setProgLoading(true)
       accreditationApi.getAll({ q: progQuery, limit: 12 }).then(res => {
         const records = res.data?.data?.data || []
         const seen = new Set()
         const suggestions = records
-          .filter((r: any) => { const k = r.program?.id; if (!k || seen.has(k)) return false; seen.add(k); return true })
+          .filter((r: any) => {
+            const k = r.program?.id
+            if (!k || seen.has(k)) return false
+            seen.add(k)
+            return true
+          })
           .map((r: any) => ({
             id: r.program?.id,
             label: r.program?.name,
@@ -231,7 +231,7 @@ export default function VerifyPage() {
               label="University"
               placeholder="Type university name e.g. University of Lagos..."
               value={uniQuery}
-              onChange={v => { setUniQuery(v); setSelectedUni(null); setResult(null); setNotFound(false) }}
+              onChange={v => { setUniQuery(v); setSelectedUni(null); setUniPrograms([]); setResult(null); setNotFound(false) }}
               suggestions={uniSuggestions}
               loading={uniLoading}
               onSelect={item => { setSelectedUni(item); setUniQuery(item.label); setUniSuggestions([]) }}
@@ -262,9 +262,9 @@ export default function VerifyPage() {
           </div>
         </div>
 
-        <div style={{ textAlign: 'center', fontSize: 12, color: '#9ca3af', marginBottom: 24 }}>
-          Type at least 2 characters to see suggestions · Select university first to filter programs
-        </div>
+        <p style={{ textAlign: 'center', fontSize: 12, color: '#9ca3af', marginBottom: 24 }}>
+          Type at least 2 characters · Select university first to filter programs by that university
+        </p>
 
         {result && cfg && (() => {
           const Icon = cfg.icon
@@ -281,7 +281,7 @@ export default function VerifyPage() {
                   ['Program', prog?.name],
                   ['Degree', prog?.degreeType],
                   ['Faculty', prog?.faculty?.name || '—'],
-                  ['Status', currentAcc?.status],
+                  ['Current status', currentAcc?.status],
                   ['Year assessed', currentAcc?.year],
                   ['Valid until', currentAcc?.expiryDate ? new Date(currentAcc.expiryDate).getFullYear() : '—'],
                   ['Total exercises', result.stats?.total],
