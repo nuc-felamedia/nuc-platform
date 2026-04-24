@@ -141,7 +141,6 @@ function CertificateDocument({ data }: { data: Props }) {
                 color: '#111827', borderLeft: '0.5px solid #f1f5f9',
                 fontFamily: label === 'Accreditation Status' ? 'inherit' : 'Georgia, serif',
                 fontWeight: label === 'Accreditation Status' ? 'bold' : 'normal',
-                color: label === 'Accreditation Status' ? cfg.color : '#111827',
               }}>
                 {value}
               </div>
