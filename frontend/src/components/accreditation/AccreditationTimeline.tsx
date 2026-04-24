@@ -1,6 +1,3 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// NEW FILE: frontend/src/components/accreditation/AccreditationTimeline.tsx
-// ─────────────────────────────────────────────────────────────────────────────
 'use client'
 
 interface TimelineRecord {
@@ -73,13 +70,11 @@ export default function AccreditationTimeline({ history, stats, programName, uni
       {/* Stats cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
         {[
-          { label: 'Full accreditation', count: stats.full, color: '#16a34a', bg: '#f0fdf4' },
+          { label: 'Full accreditation', count: stats.full,    color: '#16a34a', bg: '#f0fdf4' },
           { label: 'Interim',            count: stats.interim, color: '#ca8a04', bg: '#fefce8' },
-          { label: 'Denied',            count: stats.denied,  color: '#dc2626', bg: '#fef2f2' },
+          { label: 'Denied',             count: stats.denied,  color: '#dc2626', bg: '#fef2f2' },
         ].map(s => (
-          <div key={s.label} style={{
-            background: s.bg, borderRadius: 14, padding: '14px 16px', textAlign: 'center',
-          }}>
+          <div key={s.label} style={{ background: s.bg, borderRadius: 14, padding: '14px 16px', textAlign: 'center' }}>
             <div style={{ fontSize: 28, fontWeight: 800, color: s.color, lineHeight: 1 }}>{s.count}</div>
             <div style={{ fontSize: 11, fontWeight: 600, color: s.color, marginTop: 4, opacity: 0.8 }}>{s.label}</div>
           </div>
@@ -87,9 +82,7 @@ export default function AccreditationTimeline({ history, stats, programName, uni
       </div>
 
       {/* Visual bar chart */}
-      <div style={{
-        background: '#fff', borderRadius: 16, border: '1px solid #f1f5f9', padding: '20px 20px 16px',
-      }}>
+      <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #f1f5f9', padding: '20px 20px 16px' }}>
         <div style={{ fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 16 }}>
           Accreditation status across all {stats.total} exercise years ({stats.firstYear}–{stats.lastYear})
         </div>
@@ -101,16 +94,11 @@ export default function AccreditationTimeline({ history, stats, programName, uni
               return (
                 <div key={year} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
                   <div style={{
-                    width: 28,
-                    height: rec ? 56 : 8,
+                    width: 28, height: rec ? 56 : 8,
                     background: rec ? cfg!.bar : '#e5e7eb',
                     borderRadius: '4px 4px 2px 2px',
                     opacity: rec ? 1 : 0.4,
-                    transition: 'all .2s',
-                    position: 'relative',
-                  }}
-                    title={rec ? `${year}: ${cfg!.label}` : `${year}: Not assessed`}
-                  />
+                  }} title={rec ? `${year}: ${cfg!.label}` : `${year}: Not assessed`} />
                   <span style={{ fontSize: 9, color: '#9ca3af', transform: 'rotate(-30deg)', transformOrigin: 'center', marginTop: 2 }}>
                     {`'${String(year).slice(2)}`}
                   </span>
@@ -119,7 +107,6 @@ export default function AccreditationTimeline({ history, stats, programName, uni
             })}
           </div>
         </div>
-        {/* Legend */}
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14, marginTop: 16, paddingTop: 14, borderTop: '1px solid #f1f5f9' }}>
           {Object.entries(STATUS).filter(([k]) => k !== 'PENDING').map(([key, cfg]) => (
             <div key={key} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: '#6b7280' }}>
@@ -184,29 +171,6 @@ export default function AccreditationTimeline({ history, stats, programName, uni
         })}
       </div>
 
-      {/* Verification CTA */}
-      <div style={{
-        background: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)',
-        border: '1px solid #bfdbfe', borderRadius: 16, padding: '18px 20px',
-      }}>
-        <div style={{ fontWeight: 700, fontSize: 14, color: '#1e40af', marginBottom: 6 }}>
-          Need official verification?
-        </div>
-        <div style={{ fontSize: 13, color: '#1d4ed8', lineHeight: 1.6, marginBottom: 14 }}>
-          Download an official NUC verification letter confirming this program's accreditation
-          status at any specific year. Accepted by embassies and international employers.
-        </div>
-        <button
-          onClick={() => alert('Verification certificate download coming soon')}
-          style={{
-            background: '#1d4ed8', color: '#fff', border: 'none',
-            padding: '10px 20px', borderRadius: 10, fontSize: 13, fontWeight: 600,
-            cursor: 'pointer',
-          }}
-        >
-          Download verification certificate →
-        </button>
-      </div>
     </div>
   )
 }
