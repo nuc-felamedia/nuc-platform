@@ -1,8 +1,7 @@
 'use client'
-// src/app/auth/login/page.tsx
 import { useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -21,6 +20,8 @@ export default function LoginPage() {
   const [showPass, setShowPass] = useState(false)
   const { login, isLoading } = useAuthStore()
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const returnTo = searchParams.get('returnTo') || '/admin'
 
   const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -30,7 +31,7 @@ export default function LoginPage() {
     try {
       await login(data.email, data.password)
       toast.success('Welcome back!')
-      router.push('/dashboard')
+      router.push(returnTo)
     } catch (err: any) {
       toast.error(err?.response?.data?.message || 'Login failed. Check your credentials.')
     }
@@ -39,7 +40,6 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="w-full max-w-md">
-        {/* Logo */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2.5">
             <div className="w-10 h-10 rounded-xl bg-brand-600 flex items-center justify-center">
