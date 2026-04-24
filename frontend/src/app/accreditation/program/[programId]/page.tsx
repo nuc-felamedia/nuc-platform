@@ -1,12 +1,9 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// NEW FILE: frontend/src/app/accreditation/program/[programId]/page.tsx
-// Create the folder: mkdir -p frontend/src/app/accreditation/program/\[programId\]
-// ─────────────────────────────────────────────────────────────────────────────
 'use client'
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import AccreditationTimeline from '@/components/accreditation/AccreditationTimeline'
+import AccreditationCertificateButton from '@/components/accreditation/AccreditationCertificate'
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'https://nuc-platform-production.up.railway.app'
 
@@ -53,6 +50,7 @@ export default function ProgramHistoryPage() {
   )
 
   const { program, history, related, stats } = data
+  const currentAcc = history?.find((h: any) => h.isCurrent) || history?.[history.length - 1]
 
   return (
     <div style={{ maxWidth: 800, margin: '0 auto', padding: '40px 20px 80px' }}>
@@ -93,7 +91,7 @@ export default function ProgramHistoryPage() {
         </div>
       </div>
 
-      {/* Important context banner */}
+      {/* Info banner */}
       <div style={{
         background: '#fefce8', border: '1px solid #fef08a', borderRadius: 12,
         padding: '12px 16px', marginBottom: 28, fontSize: 13, color: '#854d0e',
@@ -106,13 +104,42 @@ export default function ProgramHistoryPage() {
         </span>
       </div>
 
-      {/* Main timeline */}
+      {/* Timeline */}
       <AccreditationTimeline
         history={history}
         stats={stats}
         programName={program.name}
         universityName={program.university.name}
       />
+
+      {/* Certificate download */}
+      {currentAcc && (
+        <div style={{
+          marginTop: 24,
+          background: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)',
+          border: '1px solid #bfdbfe', borderRadius: 16, padding: '20px 24px',
+        }}>
+          <div style={{ fontWeight: 700, fontSize: 15, color: '#1e40af', marginBottom: 6 }}>
+            Need official verification?
+          </div>
+          <p style={{ fontSize: 13, color: '#1d4ed8', lineHeight: 1.6, marginBottom: 16 }}>
+            Download an official NUC verification certificate confirming this programme's
+            accreditation status. Accepted by embassies and international employers.
+          </p>
+          <AccreditationCertificateButton
+            programId={programId as string}
+            programName={program.name}
+            universityName={program.university.name}
+            universityType={program.university.type}
+            state={program.university.state}
+            facultyName={program.faculty?.name}
+            degreeType={program.degreeType}
+            status={currentAcc.status}
+            year={currentAcc.year}
+            expiryYear={currentAcc.expiryDate ? new Date(currentAcc.expiryDate).getFullYear() : null}
+          />
+        </div>
+      )}
 
       {/* Related programs */}
       {related && related.length > 0 && (
@@ -132,7 +159,6 @@ export default function ProgramHistoryPage() {
                     display: 'block', padding: '12px 14px',
                     background: '#fff', border: '1px solid #f1f5f9',
                     borderRadius: 12, textDecoration: 'none',
-                    transition: 'border-color .15s',
                   }}
                 >
                   <div style={{ fontSize: 13, fontWeight: 600, color: '#111827', marginBottom: 4 }}>
