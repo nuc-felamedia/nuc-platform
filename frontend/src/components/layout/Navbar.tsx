@@ -1,9 +1,8 @@
 'use client'
-// src/components/layout/Navbar.tsx
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
-import { Menu, X, Search, ChevronDown, LogIn, LayoutDashboard } from 'lucide-react'
+import { Menu, X, Search, ChevronDown, LogIn, LayoutDashboard, UserCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/lib/store'
 
@@ -14,8 +13,6 @@ const NAV_LINKS = [
     href: '/accreditation',
     children: [
       { label: 'Search results', href: '/accreditation' },
-      { label: 'Undergraduate', href: '/accreditation?type=undergraduate' },
-      { label: 'Postgraduate', href: '/accreditation?type=postgraduate' },
       { label: 'Verify a program', href: '/accreditation/verify' },
     ],
   },
@@ -30,10 +27,13 @@ export default function Navbar() {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null)
   const { user, logout } = useAuthStore()
 
+  const isStaff = user && ['NUC_STAFF', 'SUPER_ADMIN', 'UNIVERSITY_ADMIN'].includes(user.role)
+
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">
+
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 shrink-0">
             <div className="w-9 h-9 rounded-lg bg-brand-600 flex items-center justify-center">
@@ -93,14 +93,27 @@ export default function Navbar() {
             >
               <Search size={18} />
             </Link>
+
             {user ? (
-              <Link
-                href={user.role === 'PUBLIC' || user.role === 'SUBSCRIBER' ? '/dashboard' : '/admin'}
-                className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-brand-600 text-white text-sm font-medium hover:bg-brand-700 transition-colors"
-              >
-                <LayoutDashboard size={15} />
-                Dashboard
-              </Link>
+              <div className="hidden sm:flex items-center gap-2">
+                {/* Staff profile link */}
+                {isStaff && (
+                  <Link
+                    href="/profile/setup"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-200 text-gray-700 text-sm font-medium hover:bg-gray-50 transition-colors"
+                  >
+                    <UserCircle size={15} />
+                    My profile
+                  </Link>
+                )}
+                <Link
+                  href={user.role === 'PUBLIC' || user.role === 'SUBSCRIBER' ? '/dashboard' : '/admin'}
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-brand-600 text-white text-sm font-medium hover:bg-brand-700 transition-colors"
+                >
+                  <LayoutDashboard size={15} />
+                  Dashboard
+                </Link>
+              </div>
             ) : (
               <Link
                 href="/auth/login"
@@ -110,6 +123,7 @@ export default function Navbar() {
                 Sign in
               </Link>
             )}
+
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
               className="lg:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-50"
@@ -137,14 +151,29 @@ export default function Navbar() {
                 {link.label}
               </Link>
             ))}
-            <div className="pt-2 border-t border-gray-100">
+            <div className="pt-2 border-t border-gray-100 space-y-1">
               {user ? (
-                <button
-                  onClick={() => { logout(); setMobileOpen(false) }}
-                  className="w-full text-left px-4 py-2.5 text-sm text-gray-700"
-                >
-                  Sign out
-                </button>
+                <>
+                  {isStaff && (
+                    <Link href="/profile/setup" onClick={() => setMobileOpen(false)}
+                      className="block px-4 py-2.5 text-sm text-brand-700 font-medium">
+                      My staff profile
+                    </Link>
+                  )}
+                  <Link
+                    href={user.role === 'PUBLIC' || user.role === 'SUBSCRIBER' ? '/dashboard' : '/admin'}
+                    onClick={() => setMobileOpen(false)}
+                    className="block px-4 py-2.5 text-sm text-gray-700 font-medium"
+                  >
+                    Dashboard
+                  </Link>
+                  <button
+                    onClick={() => { logout(); setMobileOpen(false) }}
+                    className="w-full text-left px-4 py-2.5 text-sm text-gray-500"
+                  >
+                    Sign out
+                  </button>
+                </>
               ) : (
                 <Link href="/auth/login" onClick={() => setMobileOpen(false)}
                   className="block px-4 py-2.5 text-sm text-brand-700 font-medium">
