@@ -15,7 +15,7 @@ const NAV = [
   { label: 'Universities', icon: Building2, href: '/admin/universities' },
   { label: 'Programs', icon: BookOpen, href: '/admin/programs' },
   { label: 'Accreditation', icon: FileText, href: '/admin/accreditation' },
-  { label: 'Directorates', icon: Users, href: '/admin/directorates' },
+  { label: 'Directorates', icon: Users, href: '/directorates' },
   { label: 'Posts', icon: FileText, href: '/admin/posts' },
   { label: 'Users', icon: Users, href: '/admin/users' },
   { label: 'Settings', icon: Settings, href: '/admin/settings' },
