@@ -21,6 +21,13 @@ const TYPE_LABELS: Record<string, string> = {
   CIRCULAR: 'Circular', ANNOUNCEMENT: 'Announcement',
 }
 
+function cleanWordPressContent(content: string): string {
+  return (content || '')
+    .replace(/<!--[\s\S]*?-->/g, '')
+    .replace(/<figure[^>]*>[\s\S]*?<\/figure>/g, '')
+    .trim()
+}
+
 export default function BulletinDetailPage() {
   const { slug } = useParams()
 
@@ -136,12 +143,13 @@ export default function BulletinDetailPage() {
               </div>
             )}
 
-            {/* Content */}
-            <div className="prose prose-gray max-w-none">
-              <div className="text-gray-700 leading-relaxed whitespace-pre-wrap text-sm sm:text-base">
-                {post.content}
-              </div>
-            </div>
+            {/* Content — renders WordPress HTML properly */}
+            <div
+              className="prose prose-gray max-w-none text-sm sm:text-base"
+              dangerouslySetInnerHTML={{
+                __html: cleanWordPressContent(post.content)
+              }}
+            />
 
             {/* Tags */}
             {post.tags?.length > 0 && (
