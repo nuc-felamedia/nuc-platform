@@ -129,7 +129,11 @@ import { Request, Response } from 'express'
 // Helper — get the universityId from the logged-in user
 async function getMyUniversityId(req: Request): Promise<string | null> {
   const userId = (req as any).user?.userId
-  const user = await prisma.user.findUnique({ where: { id: userId }, select: { universityId: true, role: true } })
+  if (!userId) return null
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { universityId: true, role: true }
+  })
   return user?.universityId || null
 }
 
