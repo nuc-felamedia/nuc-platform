@@ -60,3 +60,17 @@ export async function toggleUserActive(req: Request, res: Response) {
   })
   return successResponse(res, updated, `User ${updated.isActive ? 'activated' : 'deactivated'}`)
 }
+
+export async function assignUniversity(req: Request, res: Response) {
+  const { id } = req.params
+  const { universityId } = req.body
+  if (!universityId) return errorResponse(res, 'universityId is required', 400)
+  const university = await prisma.university.findUnique({ where: { id: universityId } })
+  if (!university) return errorResponse(res, 'University not found', 404)
+  const user = await prisma.user.update({
+    where: { id },
+    data: { universityId },
+    include: { university: { select: { id: true, name: true, slug: true } } },
+  })
+  return successResponse(res, user, 'University assigned successfully')
+}

@@ -1,19 +1,97 @@
 'use client'
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { adminApi, authApi } from '@/lib/api'
+import { adminApi, authApi, universitiesApi, api } from '@/lib/api'
 import { Button, Input, Select, PageLoader, EmptyState, Card } from '@/components/ui'
 import { formatDateShort, cn } from '@/lib/utils'
 import toast from 'react-hot-toast'
 
 const ROLE_CONFIG: Record<string, { label: string; color: string; desc: string }> = {
-  SUPER_ADMIN: { label: 'Super Admin', color: 'bg-red-100 text-red-700', desc: 'Full access to everything' },
-  NUC_STAFF: { label: 'NUC Staff', color: 'bg-purple-100 text-purple-700', desc: 'Can manage all data and publish content' },
-  UNIVERSITY_ADMIN: { label: 'University Admin', color: 'bg-blue-100 text-blue-700', desc: 'Can manage their university data only' },
-  SUBSCRIBER: { label: 'Subscriber', color: 'bg-green-100 text-green-700', desc: 'Full data access, API keys, exports' },
-  PUBLIC: { label: 'Public', color: 'bg-gray-100 text-gray-600', desc: 'Basic search and view only' },
+  SUPER_ADMIN:      { label: 'Super Admin',      color: 'bg-red-100 text-red-700',    desc: 'Full access to everything' },
+  NUC_STAFF:        { label: 'NUC Staff',         color: 'bg-purple-100 text-purple-700', desc: 'Can manage all data and publish content' },
+  UNIVERSITY_ADMIN: { label: 'University Admin',  color: 'bg-blue-100 text-blue-700',  desc: 'Can manage their university data only' },
+  SUBSCRIBER:       { label: 'Subscriber',        color: 'bg-green-100 text-green-700', desc: 'Full data access, API keys, exports' },
+  PUBLIC:           { label: 'Public',            color: 'bg-gray-100 text-gray-600',  desc: 'Basic search and view only' },
 }
 
+// Inline university assignment component
+function UniversityAssignment({ user, onDone }: { user: any; onDone: () => void }) {
+  const [saving, setSaving] = useState(false)
+  const [uniId, setUniId] = useState(user.universityId || '')
+
+  const { data: unis } = useQuery({
+    queryKey: ['universities-all'],
+    queryFn: () => universitiesApi.getAll({ limit: 500 }),
+    select: (res) => res.data?.data?.data || [],
+  })
+
+  async function save() {
+    if (!uniId) { toast.error('Select a university first'); return }
+    setSaving(true)
+    try {
+      await api.put(`/admin/users/${user.id}/university`, { universityId: uniId })
+      toast.success('University assigned successfully')
+      onDone()
+    } catch (e: any) {
+      toast.error(e.response?.data?.message || 'Failed to assign university')
+    } finally { setSaving(false) }
+  }
+
+  return (
+    <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
+      <select
+        value={uniId}
+        onChange={e => setUniId(e.target.value)}
+        style={{ fontSize: 11, border: '1px solid #bfdbfe', borderRadius: 6, padding: '4px 8px', background: '#eff6ff', color: '#1e40af', outline: 'none', maxWidth: 200 }}
+      >
+        <option value="">Assign university...</option>
+        {(unis || []).map((u: any) => (
+          <option key={u.id} value={u.id}>{u.name}</option>
+        ))}
+      </select>
+      <button
+        onClick={save}
+        disabled={saving || !uniId}
+        style={{ fontSize: 11, padding: '4px 10px', background: saving ? '#93c5fd' : '#1d4ed8', color: '#fff', border: 'none', borderRadius: 6, cursor: saving ? 'not-allowed' : 'pointer', fontWeight: 600 }}
+      >
+        {saving ? '...' : 'Assign'}
+      </button>
+    </div>
+  )
+}
+
+function UniversityAssignment({ user, onDone }: { user: any; onDone: () => void }) {
+  const [saving, setSaving] = useState(false)
+  const [uniId, setUniId] = useState(user.universityId || '')
+  const { data: unis } = useQuery({
+    queryKey: ['universities-all'],
+    queryFn: () => universitiesApi.getAll({ limit: 500 }),
+    select: (res) => res.data?.data?.data || [],
+  })
+  async function save() {
+    if (!uniId) { toast.error('Select a university first'); return }
+    setSaving(true)
+    try {
+      await api.put(`/admin/users/${user.id}/university`, { universityId: uniId })
+      toast.success('University assigned')
+      onDone()
+    } catch { toast.error('Failed to assign') }
+    finally { setSaving(false) }
+  }
+  return (
+    <div style={{ marginTop: 6, display: 'flex', alignItems: 'center', gap: 6 }}>
+      <select value={uniId} onChange={e => setUniId(e.target.value)}
+        style={{ fontSize: 11, border: '1px solid #bfdbfe', borderRadius: 6, padding: '4px 8px', background: '#eff6ff', color: '#1e40af', outline: 'none', maxWidth: 200 }}>
+        <option value="">Assign university...</option>
+        {(unis || []).map((u: any) => <option key={u.id} value={u.id}>{u.name}</option>)}
+      </select>
+      <button onClick={save} disabled={saving || !uniId}
+        style={{ fontSize: 11, padding: '4px 10px', background: saving ? '#93c5fd' : '#1d4ed8', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer', fontWeight: 600 }}>
+        {saving ? '...' : 'Assign'}
+      </button>
+    </div>
+  )
+}
 export default function AdminUsersPage() {
   const queryClient = useQueryClient()
   const [showCreateForm, setShowCreateForm] = useState(false)
@@ -99,63 +177,23 @@ export default function AdminUsersPage() {
         <Card className="p-6 mb-6">
           <h2 className="font-semibold text-gray-900 mb-4">Create new user</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-            <Input
-              label="First name *"
-              placeholder="Emeka"
-              value={newUser.firstName}
-              onChange={e => setNew('firstName', e.target.value)}
-            />
-            <Input
-              label="Last name *"
-              placeholder="Okafor"
-              value={newUser.lastName}
-              onChange={e => setNew('lastName', e.target.value)}
-            />
-            <Input
-              label="Email address *"
-              type="email"
-              placeholder="user@example.com"
-              value={newUser.email}
-              onChange={e => setNew('email', e.target.value)}
-            />
-            <Input
-              label="Password *"
-              type="password"
-              placeholder="Min. 8 characters"
-              value={newUser.password}
-              onChange={e => setNew('password', e.target.value)}
-            />
+            <Input label="First name *" placeholder="Emeka" value={newUser.firstName} onChange={e => setNew('firstName', e.target.value)} />
+            <Input label="Last name *" placeholder="Okafor" value={newUser.lastName} onChange={e => setNew('lastName', e.target.value)} />
+            <Input label="Email address *" type="email" placeholder="user@example.com" value={newUser.email} onChange={e => setNew('email', e.target.value)} />
+            <Input label="Password *" type="password" placeholder="Min. 8 characters" value={newUser.password} onChange={e => setNew('password', e.target.value)} />
             <div className="sm:col-span-2">
-              <Select
-                label="Access role *"
-                value={newUser.role}
-                onChange={e => setNew('role', e.target.value)}
-              >
+              <Select label="Access role *" value={newUser.role} onChange={e => setNew('role', e.target.value)}>
                 {Object.entries(ROLE_CONFIG).map(([role, { label, desc }]) => (
                   <option key={role} value={role}>{label} — {desc}</option>
                 ))}
               </Select>
             </div>
           </div>
-
-          {/* Role preview */}
           <div className={cn('rounded-xl p-3 mb-4 text-sm', ROLE_CONFIG[newUser.role]?.color)}>
             <strong>{ROLE_CONFIG[newUser.role]?.label}:</strong> {ROLE_CONFIG[newUser.role]?.desc}
-            <div className="mt-1 text-xs opacity-80">
-              {newUser.role === 'SUPER_ADMIN' && 'Can do everything including delete data and manage all users.'}
-              {newUser.role === 'NUC_STAFF' && 'Can add/edit universities, programs, accreditation records and publish bulletins.'}
-              {newUser.role === 'UNIVERSITY_ADMIN' && 'Can view and update data for their assigned university only.'}
-              {newUser.role === 'SUBSCRIBER' && 'Can access all public data, export CSV, use API keys and get email alerts.'}
-              {newUser.role === 'PUBLIC' && 'Can search and view accreditation data. Cannot export or access API.'}
-            </div>
           </div>
-
           <div className="flex gap-3">
-            <Button
-              onClick={() => createMutation.mutate(newUser)}
-              loading={createMutation.isPending}
-              disabled={!newUser.firstName || !newUser.lastName || !newUser.email || !newUser.password}
-            >
+            <Button onClick={() => createMutation.mutate(newUser)} loading={createMutation.isPending} disabled={!newUser.firstName || !newUser.lastName || !newUser.email || !newUser.password}>
               Create user
             </Button>
             <Button variant="outline" onClick={() => setShowCreateForm(false)}>Cancel</Button>
@@ -165,12 +203,7 @@ export default function AdminUsersPage() {
 
       {/* Filters */}
       <div className="flex gap-3 mb-4 flex-wrap">
-        <Input
-          placeholder="Search by name or email..."
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          className="flex-1 min-w-48"
-        />
+        <Input placeholder="Search by name or email..." value={search} onChange={e => setSearch(e.target.value)} className="flex-1 min-w-48" />
         <Select value={filterRole} onChange={e => setFilterRole(e.target.value)} className="w-48">
           <option value="">All roles</option>
           {Object.entries(ROLE_CONFIG).map(([role, { label }]) => (
@@ -191,8 +224,7 @@ export default function AdminUsersPage() {
                   <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">User</th>
                   <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Role</th>
                   <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide hidden md:table-cell">Status</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide hidden md:table-cell">Last login</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide hidden lg:table-cell">Joined</th>
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide hidden md:table-cell">Joined</th>
                   <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Actions</th>
                 </tr>
               </thead>
@@ -207,6 +239,39 @@ export default function AdminUsersPage() {
                         <div>
                           <div className="font-medium text-gray-900">{user.firstName} {user.lastName}</div>
                           <div className="text-xs text-gray-400">{user.email}</div>
+                          {user.role === 'UNIVERSITY_ADMIN' && (
+  <div className="mt-1">
+    {user.university
+      ? <span style={{ fontSize: 11, background: '#dbeafe', color: '#1e40af', padding: '2px 8px', borderRadius: 10, fontWeight: 600 }}>{user.university.name}</span>
+      : <span style={{ fontSize: 11, color: '#f59e0b' }}>⚠ No university assigned</span>
+    }
+    <UniversityAssignment user={user} onDone={() => queryClient.invalidateQueries({ queryKey: ['admin-users'] })} />
+  </div>
+)}
+                          {/* University assignment — shown for UNIVERSITY_ADMIN */}
+                          {user.role === 'UNIVERSITY_ADMIN' && (
+                            <div className="mt-1">
+                              {user.university ? (
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                                  <span style={{ fontSize: 11, background: '#dbeafe', color: '#1e40af', padding: '2px 8px', borderRadius: 10, fontWeight: 600 }}>
+                                    {user.university.name}
+                                  </span>
+                                  <UniversityAssignment
+                                    user={user}
+                                    onDone={() => queryClient.invalidateQueries({ queryKey: ['admin-users'] })}
+                                  />
+                                </div>
+                              ) : (
+                                <div>
+                                  <span style={{ fontSize: 11, color: '#f59e0b', fontWeight: 500 }}>⚠ No university assigned</span>
+                                  <UniversityAssignment
+                                    user={user}
+                                    onDone={() => queryClient.invalidateQueries({ queryKey: ['admin-users'] })}
+                                  />
+                                </div>
+                              )}
+                            </div>
+                          )}
                         </div>
                       </div>
                     </td>
@@ -232,9 +297,6 @@ export default function AdminUsersPage() {
                       </span>
                     </td>
                     <td className="px-5 py-3.5 text-xs text-gray-400 hidden md:table-cell">
-                      {user.lastLogin ? formatDateShort(user.lastLogin) : 'Never'}
-                    </td>
-                    <td className="px-5 py-3.5 text-xs text-gray-400 hidden lg:table-cell">
                       {formatDateShort(user.createdAt)}
                     </td>
                     <td className="px-5 py-3.5">
