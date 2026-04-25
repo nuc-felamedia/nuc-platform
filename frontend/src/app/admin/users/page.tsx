@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { adminApi, authApi, universitiesApi, api } from '@/lib/api'
 import { Button, Input, Select, PageLoader, EmptyState, Card } from '@/components/ui'
@@ -15,23 +15,31 @@ const ROLE_CONFIG: Record<string, { label: string; color: string; desc: string }
 }
 
 function UniversityAssignment({ user, onDone }: { user: any; onDone: () => void }) {
-  const [saving, setSaving] = useState(false)
-  const [uniId, setUniId] = useState(user.universityId || '')
+  const [saving, setSaving]           = useState(false)
+  const [query, setQuery]             = useState('')
+  const [suggestions, setSuggestions] = useState<any[]>([])
+  const [selected, setSelected]       = useState<any>(user.university || null)
+  const [searching, setSearching]     = useState(false)
 
-  const { data: unis } = useQuery({
-    queryKey: ['universities-all'],
-    queryFn: () => universitiesApi.getAll({ limit: 500 }),
-    select: (res) => {
-  const d = res.data?.data
-  return Array.isArray(d) ? d : (d?.data || [])
-},
-  })
+  useEffect(() => {
+    if (query.length < 2) { setSuggestions([]); return }
+    setSearching(true)
+    const timer = setTimeout(async () => {
+      try {
+        const res = await universitiesApi.getAll({ q: query, limit: 8 })
+        const d = res.data?.data
+        setSuggestions(Array.isArray(d) ? d : (d?.data || []))
+      } catch { setSuggestions([]) }
+      finally { setSearching(false) }
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [query])
 
   async function save() {
-    if (!uniId) { toast.error('Select a university first'); return }
+    if (!selected) { toast.error('Select a university first'); return }
     setSaving(true)
     try {
-      await api.put(`/admin/users/${user.id}/university`, { universityId: uniId })
+      await api.put(`/admin/users/${user.id}/university`, { universityId: selected.id })
       toast.success('University assigned successfully')
       onDone()
     } catch (e: any) {
@@ -40,16 +48,46 @@ function UniversityAssignment({ user, onDone }: { user: any; onDone: () => void 
   }
 
   return (
-    <div style={{ marginTop: 6, display: 'flex', alignItems: 'center', gap: 6 }}>
-      <select value={uniId} onChange={e => setUniId(e.target.value)}
-        style={{ fontSize: 11, border: '1px solid #bfdbfe', borderRadius: 6, padding: '4px 8px', background: '#eff6ff', color: '#1e40af', outline: 'none', maxWidth: 200 }}>
-        <option value="">Assign university...</option>
-        {(unis || []).map((u: any) => <option key={u.id} value={u.id}>{u.name}</option>)}
-      </select>
-      <button onClick={save} disabled={saving || !uniId}
-        style={{ fontSize: 11, padding: '4px 10px', background: saving ? '#93c5fd' : '#1d4ed8', color: '#fff', border: 'none', borderRadius: 6, cursor: saving ? 'not-allowed' : 'pointer', fontWeight: 600 }}>
-        {saving ? '...' : 'Assign'}
-      </button>
+    <div style={{ marginTop: 6 }}>
+      {selected && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+          <span style={{ fontSize: 11, background: '#dbeafe', color: '#1e40af', padding: '2px 8px', borderRadius: 10, fontWeight: 600 }}>
+            {selected.name}
+          </span>
+          <button onClick={() => { setSelected(null); setQuery('') }}
+            style={{ fontSize: 10, color: '#9ca3af', background: 'none', border: 'none', cursor: 'pointer' }}>✕</button>
+        </div>
+      )}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+        <div style={{ position: 'relative' }}>
+          <input
+            type="text"
+            placeholder="Search university..."
+            value={query}
+            onChange={e => { setQuery(e.target.value); setSelected(null) }}
+            style={{ fontSize: 11, border: '1px solid #bfdbfe', borderRadius: 6, padding: '4px 8px', background: '#eff6ff', color: '#1e40af', outline: 'none', width: 180 }}
+          />
+          {suggestions.length > 0 && (
+            <div style={{ position: 'absolute', top: '100%', left: 0, zIndex: 100, background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.1)', minWidth: 260, maxHeight: 200, overflowY: 'auto', marginTop: 2 }}>
+              {suggestions.map((u: any) => (
+                <div key={u.id}
+                  onMouseDown={e => { e.preventDefault(); setSelected(u); setQuery(''); setSuggestions([]) }}
+                  style={{ padding: '7px 12px', cursor: 'pointer', fontSize: 12, borderBottom: '1px solid #f9fafb' }}
+                  onMouseOver={e => (e.currentTarget.style.background = '#eff6ff')}
+                  onMouseOut={e => (e.currentTarget.style.background = '#fff')}
+                >
+                  <div style={{ fontWeight: 600, color: '#111827' }}>{u.name}</div>
+                  <div style={{ fontSize: 10, color: '#9ca3af' }}>{u.state} · {u.type}</div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+        <button onClick={save} disabled={saving || !selected}
+          style={{ fontSize: 11, padding: '4px 10px', background: saving || !selected ? '#93c5fd' : '#1d4ed8', color: '#fff', border: 'none', borderRadius: 6, cursor: saving || !selected ? 'not-allowed' : 'pointer', fontWeight: 600 }}>
+          {saving ? '...' : 'Assign'}
+        </button>
+      </div>
     </div>
   )
 }
@@ -200,11 +238,6 @@ export default function AdminUsersPage() {
                           <div className="text-xs text-gray-400">{user.email}</div>
                           {user.role === 'UNIVERSITY_ADMIN' && (
                             <div className="mt-1">
-                              {user.university && (
-                                <span style={{ fontSize: 11, background: '#dbeafe', color: '#1e40af', padding: '2px 8px', borderRadius: 10, fontWeight: 600 }}>
-                                  {user.university.name}
-                                </span>
-                              )}
                               {!user.university && (
                                 <span style={{ fontSize: 11, color: '#f59e0b', fontWeight: 500 }}>⚠ No university assigned</span>
                               )}
