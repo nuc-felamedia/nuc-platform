@@ -2,7 +2,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
-import { Menu, X, Search, ChevronDown, LogIn, LayoutDashboard, UserCircle } from 'lucide-react'
+import { Menu, X, Search, ChevronDown, LogIn, LayoutDashboard, UserCircle, LogOut } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/lib/store'
 
@@ -96,7 +96,6 @@ export default function Navbar() {
 
             {user ? (
               <div className="hidden sm:flex items-center gap-2">
-                {/* Staff profile link */}
                 {isStaff && (
                   <Link
                     href="/profile/setup"
@@ -113,6 +112,13 @@ export default function Navbar() {
                   <LayoutDashboard size={15} />
                   Dashboard
                 </Link>
+                <button
+                  onClick={() => { logout(); window.location.href = '/' }}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-200 text-gray-600 text-sm font-medium hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors"
+                >
+                  <LogOut size={15} />
+                  Sign out
+                </button>
               </div>
             ) : (
               <Link
