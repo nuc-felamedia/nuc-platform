@@ -288,6 +288,11 @@ model Staff {
   email      String?
   phone      String?
   photoUrl   String?
+  bio        String?
+  linkedin   String?
+  isPublic   Boolean  @default(true)
+  userId     String?  @unique
+  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
   divisionId String
   division   Division @relation(fields: [divisionId], references: [id], onDelete: Cascade)
   order      Int      @default(0)

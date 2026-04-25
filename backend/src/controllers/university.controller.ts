@@ -1,5 +1,4 @@
 // src/controllers/university.controller.ts
-import { Request, Response } from 'express'
 import { prisma } from '../utils/prisma'
 import { successResponse, errorResponse, paginatedResponse } from '../utils/response'
 import slugify from 'slugify'
@@ -161,21 +160,15 @@ export async function updateMyUniversity(req: Request, res: Response) {
 
   const { description, website, phone, email, address, city, vcName, studentPopulation, logoUrl, mission, vision } = req.body
 
+  // Build update data with only fields that exist in schema
+  const updateData: any = {}
+  if (website !== undefined) updateData.website = website
+  if (phone !== undefined) updateData.phone = phone
+  if (email !== undefined) updateData.email = email
+
   const university = await prisma.university.update({
     where: { id: uniId },
-    data: {
-      description: description ?? undefined,
-      website: website ?? undefined,
-      phone: phone ?? undefined,
-      email: email ?? undefined,
-      address: address ?? undefined,
-      city: city ?? undefined,
-      vcName: vcName ?? undefined,
-      studentPopulation: studentPopulation ? Number(studentPopulation) : undefined,
-      logoUrl: logoUrl ?? undefined,
-      mission: mission ?? undefined,
-      vision: vision ?? undefined,
-    },
+    data: updateData,
   })
   return successResponse(res, university, 'University profile updated')
 }
