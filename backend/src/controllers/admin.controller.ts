@@ -36,7 +36,12 @@ export async function getDashboard(req: Request, res: Response) {
 export async function getUsers(req: Request, res: Response) {
   const users = await prisma.user.findMany({
     orderBy: { createdAt: 'desc' },
-    select: { id: true, email: true, firstName: true, lastName: true, role: true, isActive: true, isVerified: true, lastLogin: true, createdAt: true },
+    select: {
+      id: true, email: true, firstName: true, lastName: true,
+      role: true, isActive: true, isVerified: true, lastLogin: true,
+      createdAt: true, universityId: true,
+      university: { select: { id: true, name: true, slug: true } },
+    },
   })
   return successResponse(res, users)
 }
