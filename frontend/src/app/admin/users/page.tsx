@@ -21,7 +21,10 @@ function UniversityAssignment({ user, onDone }: { user: any; onDone: () => void 
   const { data: unis } = useQuery({
     queryKey: ['universities-all'],
     queryFn: () => universitiesApi.getAll({ limit: 500 }),
-    select: (res) => res.data?.data?.data || [],
+    select: (res) => {
+  const d = res.data?.data
+  return Array.isArray(d) ? d : (d?.data || [])
+},
   })
 
   async function save() {
