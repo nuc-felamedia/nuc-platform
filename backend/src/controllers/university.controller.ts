@@ -122,3 +122,94 @@ export async function getStates(req: Request, res: Response) {
   })
   return successResponse(res, states.map((s) => s.state))
 }
+// ADD these functions to backend/src/controllers/university.controller.ts
+// These are scoped endpoints — university admins can only touch their own data
+
+import { Request, Response } from 'express'
+
+// Helper — get the universityId from the logged-in user
+async function getMyUniversityId(req: Request): Promise<string | null> {
+  const userId = (req as any).user?.userId
+  const user = await prisma.user.findUnique({ where: { id: userId }, select: { universityId: true, role: true } })
+  return user?.universityId || null
+}
+
+// GET /api/v1/universities/my — get the university this admin manages
+export async function getMyUniversity(req: Request, res: Response) {
+  const uniId = await getMyUniversityId(req)
+  if (!uniId) return errorResponse(res, 'No university assigned to your account. Contact NUC admin.', 403)
+
+  const university = await prisma.university.findUnique({
+    where: { id: uniId },
+    include: {
+      programs: {
+        orderBy: { name: 'asc' },
+        include: {
+          faculty: true,
+          accreditations: { where: { isCurrent: true }, select: { status: true, year: true, expiryDate: true } },
+        },
+      },
+    },
+  })
+  return successResponse(res, university)
+}
+
+// PUT /api/v1/universities/my — update their university profile
+export async function updateMyUniversity(req: Request, res: Response) {
+  const uniId = await getMyUniversityId(req)
+  if (!uniId) return errorResponse(res, 'No university assigned to your account', 403)
+
+  const { description, website, phone, email, address, city, vcName, studentPopulation, logoUrl, mission, vision } = req.body
+
+  const university = await prisma.university.update({
+    where: { id: uniId },
+    data: {
+      description: description ?? undefined,
+      website: website ?? undefined,
+      phone: phone ?? undefined,
+      email: email ?? undefined,
+      address: address ?? undefined,
+      city: city ?? undefined,
+      vcName: vcName ?? undefined,
+      studentPopulation: studentPopulation ? Number(studentPopulation) : undefined,
+      logoUrl: logoUrl ?? undefined,
+      mission: mission ?? undefined,
+      vision: vision ?? undefined,
+    },
+  })
+  return successResponse(res, university, 'University profile updated')
+}
+
+// GET /api/v1/universities/my/programs — get programs for their university
+export async function getMyPrograms(req: Request, res: Response) {
+  const uniId = await getMyUniversityId(req)
+  if (!uniId) return errorResponse(res, 'No university assigned', 403)
+
+  const programs = await prisma.program.findMany({
+    where: { universityId: uniId, isActive: true },
+    orderBy: { name: 'asc' },
+    include: {
+      faculty: true,
+      accreditations: {
+        where: { isCurrent: true },
+        select: { status: true, year: true, expiryDate: true },
+      },
+    },
+  })
+  return successResponse(res, programs)
+}
+
+// GET /api/v1/universities/my/stats — dashboard stats for their university
+export async function getMyUniversityStats(req: Request, res: Response) {
+  const uniId = await getMyUniversityId(req)
+  if (!uniId) return errorResponse(res, 'No university assigned', 403)
+
+  const [totalPrograms, fullCount, interimCount, deniedCount] = await Promise.all([
+    prisma.program.count({ where: { universityId: uniId, isActive: true } }),
+    prisma.accreditation.count({ where: { program: { universityId: uniId }, status: 'FULL', isCurrent: true } }),
+    prisma.accreditation.count({ where: { program: { universityId: uniId }, status: 'INTERIM', isCurrent: true } }),
+    prisma.accreditation.count({ where: { program: { universityId: uniId }, status: 'DENIED', isCurrent: true } }),
+  ])
+
+  return successResponse(res, { totalPrograms, fullCount, interimCount, deniedCount })
+}
