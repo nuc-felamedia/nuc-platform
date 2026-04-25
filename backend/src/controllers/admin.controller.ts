@@ -2,7 +2,6 @@
 import { Request, Response } from 'express'
 import { prisma } from '../utils/prisma'
 import { successResponse, errorResponse } from '../utils/response'
-import { successResponse } from '../utils/response'
 
 export async function getDashboard(req: Request, res: Response) {
   const [
