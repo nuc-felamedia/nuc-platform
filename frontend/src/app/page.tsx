@@ -64,7 +64,7 @@ export default async function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-brand-700">
             {[
-              { label: 'Total universities', value: stats?.totalUniversities || 241 },
+              { label: 'Total universities', value: stats?.totalUniversities || 309 },
               { label: 'Federal universities', value: stats?.federalCount || 74 },
               { label: 'State universities', value: stats?.stateCount || 67 },
               { label: 'Private universities', value: stats?.privateCount || 100 },
@@ -179,7 +179,7 @@ export default async function HomePage() {
           <h2 className="font-display text-xl font-bold text-gray-900 mb-6">Key services</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
-              { title: 'University directory', desc: 'Browse all 241 NUC-approved universities by type, state and accreditation status.', href: '/universities', icon: Building2, tag: '241 universities' },
+              { title: 'University directory', desc: 'Browse all 309 NUC-approved universities by type, state and accreditation status.', href: '/universities', icon: Building2, tag: '309 universities' },
               { title: 'Accreditation results', desc: 'Full searchable database of undergraduate and postgraduate accreditation records.', href: '/accreditation', icon: CheckCircle, tag: 'Searchable database' },
               { title: 'Directorates', desc: 'Explore NUC departments, divisions, directors and staff across all directorates.', href: '/directorates', icon: Users, tag: '15+ directorates' },
               { title: 'Bulletins & circulars', desc: 'Official NUC announcements, press releases and circulars for universities.', href: '/bulletins', icon: FileText, tag: 'Latest news' },
@@ -316,12 +316,12 @@ export default async function HomePage() {
                 The National Universities Commission (NUC) was established in 1962 to advise the Federal Government on the funding needs of universities and ensure quality university education in Nigeria.
               </p>
               <p className="text-gray-500 leading-relaxed mb-6">
-                Today, NUC regulates 241 approved universities across Nigeria, ensuring they meet minimum academic standards and protecting the value of Nigerian degrees globally.
+                Today, NUC regulates 309 approved universities across Nigeria, ensuring they meet minimum academic standards and protecting the value of Nigerian degrees globally.
               </p>
               <div className="grid grid-cols-2 gap-4 mb-6">
                 {[
                   { label: 'Year established', value: '1962' },
-                  { label: 'Universities regulated', value: '241' },
+                  { label: 'Universities regulated', value: '309' },
                   { label: 'Programs accredited', value: '3,800+' },
                   { label: 'Annual inspections', value: '500+' },
                 ].map(({ label, value }) => (
