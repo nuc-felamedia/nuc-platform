@@ -42,7 +42,7 @@ export async function login(req: Request, res: Response) {
 
   await prisma.user.update({ where: { id: user.id }, data: { lastLogin: new Date() } })
 
-  const payload = { userId: user.id, email: user.email, role: user.role }
+  const payload = { userId: user.id, email: user.email, role: user.role, universityId: user.universityId || null }
   const accessToken = generateAccessToken(payload)
   const refreshToken = generateRefreshToken(payload)
 
