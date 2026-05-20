@@ -44,10 +44,7 @@ export default function AdminRootLayout({ children }: { children: React.ReactNod
       <aside className="w-56 bg-white border-r border-gray-100 hidden lg:flex flex-col fixed top-0 left-0 h-screen z-40">
         <div className="p-5 border-b border-gray-100">
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-brand-600 flex items-center justify-center">
-              <span className="text-white font-bold text-xs font-display">N</span>
-            </div>
-            <span className="font-display font-bold text-gray-900 text-sm">NUC Admin</span>
+            <img src="/nuc-logo.png" alt="NUC" style={{height: "36px", width: "auto"}} />
           </Link>
         </div>
 
@@ -100,10 +97,7 @@ export default function AdminRootLayout({ children }: { children: React.ReactNod
       {/* Mobile top bar */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-white border-b border-gray-100 px-4 h-14 flex items-center justify-between">
         <Link href="/admin" className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-brand-600 flex items-center justify-center">
-            <span className="text-white font-bold text-xs">N</span>
-          </div>
-          <span className="font-bold text-sm text-gray-900">NUC Admin</span>
+          <img src="/nuc-logo.png" alt="NUC" style={{height: "32px", width: "auto"}} />
         </Link>
         <button onClick={handleLogout} className="text-xs text-red-500 px-3 py-1.5 rounded-lg border border-red-200">
           Sign out

@@ -8,10 +8,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-lg bg-brand-600 flex items-center justify-center">
-                <span className="text-white font-bold text-xs font-display">N</span>
-              </div>
-              <span className="text-white font-display font-bold">NUC Platform</span>
+              <img src="/nuc-logo.png" alt="NUC" style={{height: "40px", width: "auto", filter: "brightness(0) invert(1)"}} />
             </div>
             <p className="text-sm text-gray-400 leading-relaxed">
               Nigeria's official higher education accreditation database. Powered by the National Universities Commission.

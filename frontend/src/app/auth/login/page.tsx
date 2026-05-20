@@ -42,10 +42,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-xl bg-brand-600 flex items-center justify-center">
-              <span className="text-white font-bold font-display">N</span>
-            </div>
-            <span className="font-display font-bold text-xl text-gray-900">NUC Platform</span>
+            <img src="/nuc-logo.png" alt="NUC" style={{height: "48px", width: "auto"}} />
           </Link>
           <p className="mt-4 text-gray-500 text-sm">Sign in to your account</p>
         </div>
