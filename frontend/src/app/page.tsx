@@ -79,6 +79,30 @@ export default async function HomePage() {
       </section>
 
       {/* ── FOR WHOM ── */}
+      <section className="py-12 bg-white border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="flex flex-col md:flex-row items-center gap-10">
+            <div className="shrink-0">
+              <img src="/es-photo.jpg" alt="Prof. Abdullahi Yusufu Ribadu" className="w-52 h-64 object-cover object-top rounded-2xl border border-gray-100" />
+            </div>
+            <div>
+              <div className="text-xs font-semibold text-brand-600 uppercase tracking-widest mb-3">Executive Secretary</div>
+              <h2 className="font-display text-2xl font-bold text-gray-900 mb-1">Prof. Abdullahi Yusufu Ribadu, FCVSN</h2>
+              <p className="text-sm text-gray-500 mb-4">Executive Secretary, National Universities Commission</p>
+              <p className="text-gray-600 leading-relaxed max-w-2xl">
+                Professor Ribadu leads the National Universities Commission with a seven-point cardinal agenda focused on
+                increasing access, enhancing funding, driving digitisation, strengthening quality assurance, promoting
+                innovation and research, stabilising the academic calendar, and revisiting NUC laws — all in service of
+                transforming the Nigerian University System.
+              </p>
+              <div className="mt-4 text-sm text-gray-400">
+                Plot 430, Aguiyi Ironsi Street, Maitama District, Abuja, FCT &nbsp;·&nbsp; info@nuc.edu.ng &nbsp;·&nbsp; www.nuc.edu.ng
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="bg-gray-50 border-b border-gray-100 py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-5">I am looking for information as a...</p>
