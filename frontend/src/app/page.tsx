@@ -86,19 +86,28 @@ export default async function HomePage() {
               <img src="/es-photo.jpg" alt="Prof. Abdullahi Yusufu Ribadu" className="w-52 h-64 object-cover object-top rounded-2xl border border-gray-100" />
             </div>
             <div>
-              <div className="text-xs font-semibold text-brand-600 uppercase tracking-widest mb-3">Executive Secretary</div>
-              <h2 className="font-display text-2xl font-bold text-gray-900 mb-1">Prof. Abdullahi Yusufu Ribadu, FCVSN</h2>
-              <p className="text-sm text-gray-500 mb-4">Executive Secretary, National Universities Commission</p>
-              <p className="text-gray-600 leading-relaxed max-w-2xl">
-                Professor Ribadu leads the National Universities Commission with a seven-point cardinal agenda focused on
-                increasing access, enhancing funding, driving digitisation, strengthening quality assurance, promoting
-                innovation and research, stabilising the academic calendar, and revisiting NUC laws — all in service of
-                transforming the Nigerian University System.
-              </p>
-              <div className="mt-4 text-sm text-gray-400">
-                Plot 430, Aguiyi Ironsi Street, Maitama District, Abuja, FCT &nbsp;·&nbsp; info@nuc.edu.ng &nbsp;·&nbsp; www.nuc.edu.ng
+                <div className="text-xs font-semibold text-brand-600 uppercase tracking-widest mb-3">Message from the Executive Secretary</div>
+                <h2 className="font-display text-2xl font-bold text-gray-900 mb-1">Prof. Abdullahi Yusufu Ribadu, FCVSN</h2>
+                <p className="text-sm text-brand-600 font-medium mb-4">Executive Secretary, National Universities Commission</p>
+                <p className="text-gray-600 leading-relaxed max-w-2xl mb-3">
+                  Born in Fufore, Adamawa State on September 2nd, 1960, Professor Abdullahi Yusufu Ribadu, FCVSN embodies a lifelong
+                  dedication to education and a relentless pursuit of excellence. A distinguished veterinary scientist, he holds a DVM
+                  from Ahmadu Bello University, a PhD from the University of Liverpool, and a postdoctoral fellowship from Rakuno Gakuen
+                  University, Japan. He served as Vice-Chancellor of the Federal University of Technology, Yola (2004–2009) and
+                  Jigawa State University (2013), and is a Fellow of the College of Veterinary Surgeons of Nigeria (FCVSN).
+                </p>
+                <p className="text-gray-600 leading-relaxed max-w-2xl mb-5">
+                  As Executive Secretary of NUC, Professor Ribadu is implementing a seven-point agenda focused on increasing access,
+                  enhancing funding, driving digitisation, strengthening quality assurance, promoting innovation and research,
+                  stabilising the academic calendar, and revisiting NUC laws — all in service of transforming the Nigerian University System.
+                </p>
+                <a href="/about#executive-secretary" className="inline-flex items-center gap-2 text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 px-4 py-2 rounded-lg transition-colors">
+                  Read full profile →
+                </a>
+                <div className="mt-5 pt-4 border-t border-gray-100 text-sm text-gray-400">
+                  Plot 430, Aguiyi Ironsi Street, Maitama District, Abuja, FCT · info@nuc.edu.ng · www.nuc.edu.ng
+                </div>
               </div>
-            </div>
           </div>
         </div>
       </section>
