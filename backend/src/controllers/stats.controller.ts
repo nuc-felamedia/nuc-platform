@@ -25,12 +25,19 @@ export async function getStats(req: Request, res: Response) {
     prisma.accreditation.count({ where: { isCurrent: true, status: 'DENIED' } }),
   ])
 
+  // Use official NUC counts (Federal 74, State 67, Private 168 = 309)
+  const officialTotal = 309
+  const officialFederal = 74
+  const officialState = 67
+  const officialPrivate = 168
+  const officialTransnational = officialTotal - officialFederal - officialState - officialPrivate
+
   return successResponse(res, {
-    totalUniversities,
-    federalCount,
-    stateCount,
-    privateCount,
-    transnationalCount: totalUniversities - federalCount - stateCount - privateCount,
+    totalUniversities: officialTotal,
+    federalCount: officialFederal,
+    stateCount: officialState,
+    privateCount: officialPrivate,
+    transnationalCount: officialTransnational,
     totalPrograms,
     accreditedPrograms,
     interimPrograms,
