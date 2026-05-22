@@ -15,6 +15,10 @@ router.post('/seed-directors', async (req: any, res: any) => {
   const dirs = [
     { slug: 'academic-planning', name: 'Mallam Abubakar Muhammad Girei', title: 'Director, Academic Planning', photo: 'https://www.nuc.edu.ng/wp-content/uploads/2025/06/MNM_3044.jpg' },
     { slug: 'inspection-and-monitoring', name: 'Mrs. Justina Onyema Emerole', title: 'Director, Inspection & Monitoring', photo: 'https://www.nuc.edu.ng/wp-content/uploads/2026/01/Mrs.-Emerole-scaled.jpg' },
+    { slug: 'inspection', name: 'Mrs. Justina Onyema Emerole', title: 'Director, Inspection & Monitoring', photo: 'https://www.nuc.edu.ng/wp-content/uploads/2026/01/Mrs.-Emerole-scaled.jpg' },
+    { slug: 'ict-and-digital-services', name: 'Mal. Lawal Mohammed Faruk', title: 'Director, Research Innovations & IT', photo: 'https://www.nuc.edu.ng/wp-content/uploads/2025/06/MNM_3043-e1750085770353.jpg' },
+    { slug: 'finance-and-accounts', name: 'Dr. Zakariya Sini Kwanta', title: 'Director, Finance and Accounts', photo: 'https://www.nuc.edu.ng/wp-content/uploads/2026/01/Dr.-Zachary-Kwanta.jpeg' },
+    { slug: 'research-and-innovation', name: 'Mal. Lawal Mohammed Faruk', title: 'Director, Research Innovations & IT', photo: 'https://www.nuc.edu.ng/wp-content/uploads/2025/06/MNM_3043-e1750085770353.jpg' },
     { slug: 'finance-accounts', name: 'Dr. Zakariya Sini Kwanta', title: 'Director, Finance and Accounts', photo: 'https://www.nuc.edu.ng/wp-content/uploads/2026/01/Dr.-Zachary-Kwanta.jpeg' },
     { slug: 'human-resources', name: 'Mrs. Alissabatu Balogun', title: 'Director, Human Resources', photo: 'https://www.nuc.edu.ng/wp-content/uploads/2026/02/Mrs-Balogun.jpg' },
     { slug: 'ict', name: 'Mal. Lawal Mohammed Faruk', title: 'Director, Research Innovations & IT', photo: 'https://www.nuc.edu.ng/wp-content/uploads/2025/06/MNM_3043-e1750085770353.jpg' },
