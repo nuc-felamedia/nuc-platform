@@ -6,8 +6,9 @@ import { statsApi, universitiesApi, postsApi } from '@/lib/api'
 
 async function getHomeData() {
   try {
+    const API = process.env.NEXT_PUBLIC_API_URL || 'https://nuc-platform-production.up.railway.app'
     const [statsRes, unisRes, postsRes] = await Promise.all([
-      statsApi.get(),
+      fetch(`${API}/api/v1/stats`, { cache: 'no-store' }).then(r => r.json()).then(d => ({ data: d })),
       universitiesApi.getAll({ limit: 6 }),
       postsApi.getAll({ limit: 4, status: 'PUBLISHED' }),
     ])
