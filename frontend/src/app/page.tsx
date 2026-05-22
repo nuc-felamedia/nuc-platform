@@ -82,7 +82,7 @@ export default async function HomePage() {
       {/* ── FOR WHOM ── */}
       <section className="py-12 bg-white border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="flex flex-col md:flex-row items-center gap-10">
+          <div className="flex flex-col md:flex-row items-center gap-12 justify-center">
             <div className="shrink-0">
               <img src="/es-photo.jpg" alt="Prof. Abdullahi Yusufu Ribadu" className="w-72 h-80 object-cover object-top rounded-2xl border border-gray-100" />
             </div>
