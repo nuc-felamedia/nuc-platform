@@ -84,7 +84,7 @@ export default async function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex flex-col md:flex-row items-center gap-10">
             <div className="shrink-0">
-              <img src="/es-photo.jpg" alt="Prof. Abdullahi Yusufu Ribadu" className="w-52 h-64 object-cover object-top rounded-2xl border border-gray-100" />
+              <img src="/es-photo.jpg" alt="Prof. Abdullahi Yusufu Ribadu" className="w-72 h-80 object-cover object-top rounded-2xl border border-gray-100" />
             </div>
             <div>
                 <div className="text-xs font-semibold text-brand-600 uppercase tracking-widest mb-3">Message from the Executive Secretary</div>
@@ -102,7 +102,7 @@ export default async function HomePage() {
                   enhancing funding, driving digitisation, strengthening quality assurance, promoting innovation and research,
                   stabilising the academic calendar, and revisiting NUC laws — all in service of transforming the Nigerian University System.
                 </p>
-                <a href="/about#executive-secretary" className="inline-flex items-center gap-2 text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 px-4 py-2 rounded-lg transition-colors">
+                <a href="/bulletins/es-renews-commitment-to-pursuing-nus-roadmap-in-2026" className="inline-flex items-center gap-2 text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 px-4 py-2 rounded-lg transition-colors">
                   Read full profile →
                 </a>
                 <div className="mt-5 pt-4 border-t border-gray-100 text-sm text-gray-400">
