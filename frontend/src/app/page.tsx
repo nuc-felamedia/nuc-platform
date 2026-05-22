@@ -102,7 +102,7 @@ export default async function HomePage() {
                   enhancing funding, driving digitisation, strengthening quality assurance, promoting innovation and research,
                   stabilising the academic calendar, and revisiting NUC laws — all in service of transforming the Nigerian University System.
                 </p>
-                <a href="/bulletins/es-renews-commitment-to-pursuing-nus-roadmap-in-2026" className="inline-flex items-center gap-2 text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 px-4 py-2 rounded-lg transition-colors">
+                <a href="/about/executive-secretary" className="inline-flex items-center gap-2 text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 px-4 py-2 rounded-lg transition-colors">
                   Read full profile →
                 </a>
                 <div className="mt-5 pt-4 border-t border-gray-100 text-sm text-gray-400">
