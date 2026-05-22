@@ -5,7 +5,7 @@ export default function Footer() {
   return (
     <footer className="bg-gray-900 text-gray-300 mt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 mb-10">
           <div>
             <div className="flex items-center gap-2 mb-4">
               <img src="/nuc-logo.png" alt="NUC" style={{height: "40px", width: "auto", filter: "brightness(0) invert(1)"}} />
@@ -43,9 +43,25 @@ export default function Footer() {
             <ul className="space-y-2 text-sm">
               {[
                 ['About us', '/about'],
+                ['Executive Secretary', '/about/executive-secretary'],
                 ['Directorates', '/directorates'],
                 ['Bulletins', '/bulletins'],
-                ['Contact', '/about#contact'],
+                ['Contact us', '/contact'],
+              ].map(([l, h]) => (
+                <li key={l}><Link href={h} className="hover:text-white transition-colors">{l}</Link></li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="text-white font-semibold mb-4 text-sm">Quick Links</h4>
+            <ul className="space-y-2 text-sm">
+              {[
+                ['SERVICOM', '/servicom'],
+                ['Freedom of Information', '/freedom-of-information'],
+                ['CCMAS', '/ccmas'],
+                ['Part-Time Programmes', '/part-time-programmes'],
+                ['Careers', 'https://careers.nuc.edu.ng'],
               ].map(([l, h]) => (
                 <li key={l}><Link href={h} className="hover:text-white transition-colors">{l}</Link></li>
               ))}
