@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/lib/store'
 
 const NAV_LINKS = [
+  { label: 'Home', href: '/' },
   { label: 'Universities', href: '/universities' },
   {
     label: 'Accreditation',
