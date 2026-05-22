@@ -39,7 +39,7 @@ export default function UniversitiesPage() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="font-display text-3xl font-bold text-gray-900 mb-2">Nigerian Universities</h1>
-          <p className="text-gray-500">Browse all {pagination?.total || 241} NUC-approved universities</p>
+          <p className="text-gray-500">Browse all 309 NUC-approved universities</p>
         </div>
 
         {/* Type tabs */}
