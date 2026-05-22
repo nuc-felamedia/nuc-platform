@@ -7,15 +7,15 @@ import { statsApi, universitiesApi, postsApi } from '@/lib/api'
 async function getHomeData() {
   try {
     const API = process.env.NEXT_PUBLIC_API_URL || 'https://nuc-platform-production.up.railway.app'
-    const [statsRes, unisRes, postsRes] = await Promise.all([
-      fetch(`${API}/api/v1/stats`, { cache: 'no-store' }).then(r => r.json()).then(d => ({ data: d })),
-      universitiesApi.getAll({ limit: 6 }),
-      postsApi.getAll({ limit: 4, status: 'PUBLISHED' }),
+    const [statsData, unisData, postsData] = await Promise.all([
+      fetch(`${API}/api/v1/stats`, { cache: 'no-store' }).then(r => r.json()),
+      fetch(`${API}/api/v1/universities?limit=6`, { cache: 'no-store' }).then(r => r.json()),
+      fetch(`${API}/api/v1/posts?limit=3&status=PUBLISHED`, { cache: 'no-store' }).then(r => r.json()),
     ])
     return {
-      stats: statsRes.data.data,
-      universities: unisRes.data.data,
-      posts: postsRes.data.data,
+      stats: statsData.data,
+      universities: unisData.data?.data || [],
+      posts: postsData.data?.data || [],
     }
   } catch {
     return { stats: null, universities: [], posts: [] }
