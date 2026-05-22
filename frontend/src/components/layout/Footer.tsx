@@ -57,6 +57,7 @@ export default function Footer() {
             <h4 className="text-white font-semibold mb-4 text-sm">Quick Links</h4>
             <ul className="space-y-2 text-sm">
               {[
+                ['Guidelines & Documents', '/guidelines'],
                 ['SERVICOM', '/servicom'],
                 ['Freedom of Information', '/freedom-of-information'],
                 ['CCMAS', '/ccmas'],

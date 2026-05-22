@@ -27,6 +27,7 @@ const NAV_LINKS = [
       { label: 'Executive Secretary', href: '/about/executive-secretary' },
       { label: 'Directorates', href: '/directorates' },
       { label: 'Contact Us', href: '/contact' },
+      { label: 'Guidelines & Documents', href: '/guidelines' },
     ],
   },
 ]
