@@ -31,7 +31,16 @@ export default function LoginPage() {
     try {
       await login(data.email, data.password)
       toast.success('Welcome back!')
-      router.push(returnTo)
+      const { user } = useAuthStore.getState()
+      if (returnTo && returnTo !== '/admin') {
+        router.push(returnTo)
+      } else if (user?.role === 'UNIVERSITY_ADMIN') {
+        router.push('/university-admin')
+      } else if (['SUPER_ADMIN', 'NUC_STAFF'].includes(user?.role || '')) {
+        router.push('/admin')
+      } else {
+        router.push('/dashboard')
+      }
     } catch (err: any) {
       toast.error(err?.response?.data?.message || 'Login failed. Check your credentials.')
     }
