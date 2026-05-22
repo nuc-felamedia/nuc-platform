@@ -18,7 +18,16 @@ const NAV_LINKS = [
   },
   { label: 'Directorates', href: '/directorates' },
   { label: 'Bulletins', href: '/bulletins' },
-  { label: 'About', href: '/about' },
+  {
+    label: 'About',
+    href: '/about',
+    children: [
+      { label: 'About NUC', href: '/about' },
+      { label: 'Executive Secretary', href: '/about/executive-secretary' },
+      { label: 'Directorates', href: '/directorates' },
+      { label: 'Contact Us', href: '/contact' },
+    ],
+  },
 ]
 
 export default function Navbar() {
