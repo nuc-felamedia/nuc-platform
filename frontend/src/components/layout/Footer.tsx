@@ -69,7 +69,20 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-gray-800 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-500">
+        {/* Social media */}
+        <div className="border-t border-gray-800 pt-6 mb-6 flex items-center gap-6">
+          <span className="text-sm text-gray-500 font-medium">Follow NUC:</span>
+          <div className="flex items-center gap-4">
+            <a href="https://www.facebook.com/share/1987638piy/" target="_blank" rel="noopener noreferrer"
+              className="text-gray-400 hover:text-white transition-colors text-sm font-medium">Facebook</a>
+            <a href="https://x.com/OfficialNUC" target="_blank" rel="noopener noreferrer"
+              className="text-gray-400 hover:text-white transition-colors text-sm font-medium">Twitter / X</a>
+            <a href="https://www.instagram.com/officialnuc_" target="_blank" rel="noopener noreferrer"
+              className="text-gray-400 hover:text-white transition-colors text-sm font-medium">Instagram</a>
+          </div>
+        </div>
+
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-500">
           <p>© {new Date().getFullYear()} National Universities Commission, Nigeria. All rights reserved.</p>
           <div className="flex gap-4">
             <Link href="/privacy" className="hover:text-gray-300 transition-colors">Privacy</Link>
