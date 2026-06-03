@@ -13,12 +13,16 @@ export async function getPosts(req: Request, res: Response) {
   const where: any = { status: 'PUBLISHED' }
   if (req.query.type) where.type = req.query.type
   if (req.query.q) where.title = { contains: req.query.q as string, mode: 'insensitive' }
+  if (req.query.year) {
+    const y = parseInt(req.query.year as string)
+    where.publishedAt = { gte: new Date(`${y}-01-01`), lt: new Date(`${y + 1}-01-01`) }
+  }
 
   const [posts, total] = await Promise.all([
     prisma.post.findMany({
       where, skip, take: limit,
       orderBy: { publishedAt: 'desc' },
-      select: { id: true, title: true, slug: true, excerpt: true, type: true, featuredImage: true, publishedAt: true, authorName: true, viewCount: true, tags: true },
+      select: { id: true, title: true, slug: true, excerpt: true, type: true, featuredImage: true, content: true, publishedAt: true, authorName: true, viewCount: true, tags: true },
     }),
     prisma.post.count({ where }),
   ])
