@@ -120,8 +120,7 @@ export default async function HomePage() {
             {[
               { icon: Users, label: 'Student or parent', desc: 'Verify accreditation, find approved programs', href: '/accreditation/verify', color: 'bg-blue-50 border-blue-100 hover:border-blue-300 text-blue-700' },
               { icon: Building2, label: 'University', desc: 'Submit data, check status, manage programs', href: '/auth/login', color: 'bg-green-50 border-green-100 hover:border-green-300 text-green-700' },
-              { icon: Globe, label: 'Embassy or institution', desc: 'Verify Nigerian degrees and credentials', href: '/accreditation', color: 'bg-purple-50 border-purple-100 hover:border-purple-300 text-purple-700' },
-              { icon: FileText, label: 'Researcher or journalist', desc: 'Access data, statistics, API', href: '/documents', color: 'bg-amber-50 border-amber-100 hover:border-amber-300 text-amber-700' },
+              { icon: Globe, label: 'Embassy or institution', desc: 'Verify Nigerian degrees and credentials — login required', href: '/auth/login?returnTo=/accreditation', color: 'bg-purple-50 border-purple-100 hover:border-purple-300 text-purple-700' },
             ].map(({ icon: Icon, label, desc, href, color }) => (
               <Link key={label} href={href}
                 className={`group flex flex-col gap-3 p-5 rounded-2xl border bg-white transition-all hover:shadow-sm ${color.split(' ').filter(c => c.startsWith('hover') || c.startsWith('border')).join(' ')} border`}>
