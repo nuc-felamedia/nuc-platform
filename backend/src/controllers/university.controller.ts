@@ -13,7 +13,7 @@ export async function getUniversities(req: Request, res: Response) {
   const skip = (page - 1) * limit
 
   const where: any = { isActive: true }
-  if (req.query.type) where.type = req.query.type
+  if (req.query.type) where.type = { equals: (req.query.type as string).toUpperCase() }
   if (req.query.state) where.state = req.query.state
   if (req.query.q) {
     where.OR = [
