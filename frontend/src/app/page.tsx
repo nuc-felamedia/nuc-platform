@@ -149,16 +149,16 @@ export default async function HomePage() {
                 Most used feature
               </div>
               <h2 className="font-display text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
-                Verify a program's accreditation in seconds
+                Verify Approved Programs
               </h2>
               <p className="text-gray-500 leading-relaxed mb-6">
-                Students, parents, embassies and employers use this tool to instantly confirm whether a Nigerian university program carries full NUC accreditation.
+                Search and verify NUC-approved programmes across all Nigerian universities. Find out if a programme is approved before you apply or enrol.
               </p>
               <div className="space-y-3 mb-8">
                 {[
                   'Select the university',
                   'Select the program',
-                  'Get instant accreditation status',
+                  'Check if a programme is NUC-approved',
                 ].map((step, i) => (
                   <div key={step} className="flex items-center gap-3">
                     <div className="w-6 h-6 rounded-full bg-brand-600 text-white text-xs font-bold flex items-center justify-center shrink-0">
@@ -168,9 +168,9 @@ export default async function HomePage() {
                   </div>
                 ))}
               </div>
-              <Link href="/accreditation/verify"
+              <Link href="/accreditation"
                 className="inline-flex items-center gap-2 px-6 py-3 bg-brand-600 text-white rounded-xl font-semibold text-sm hover:bg-brand-700 transition-colors">
-                Verify accreditation now <ArrowRight size={16} />
+                Search approved programmes <ArrowRight size={16} />
               </Link>
             </div>
             <div className="bg-gray-50 rounded-2xl border border-gray-100 p-6">
