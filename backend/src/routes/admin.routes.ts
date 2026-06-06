@@ -43,4 +43,28 @@ router.post('/seed-directors', async (req: any, res: any) => {
   res.json({ success: true, results, slugsInDB: all.map((x: any) => x.slug) })
 })
 
+// Directorate management
+router.delete('/directorates/:id', async (req: any, res: any) => {
+  const { prisma } = require('../utils/prisma')
+  try {
+    await prisma.directorate.delete({ where: { id: req.params.id } })
+    res.json({ success: true, message: 'Directorate deleted' })
+  } catch (e: any) {
+    res.status(400).json({ success: false, message: e.message })
+  }
+})
+
+router.patch('/directorates/:id', async (req: any, res: any) => {
+  const { prisma } = require('../utils/prisma')
+  try {
+    const updated = await prisma.directorate.update({
+      where: { id: req.params.id },
+      data: req.body
+    })
+    res.json({ success: true, data: updated })
+  } catch (e: any) {
+    res.status(400).json({ success: false, message: e.message })
+  }
+})
+
 export default router
