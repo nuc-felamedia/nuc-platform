@@ -10,7 +10,7 @@ async function getHomeData() {
     const [statsData, unisData, postsData] = await Promise.all([
       fetch(`${API}/api/v1/stats`, { cache: 'no-store' }).then(r => r.json()),
       fetch(`${API}/api/v1/universities?limit=6`, { cache: 'no-store' }).then(r => r.json()),
-      fetch(`${API}/api/v1/posts?limit=3&status=PUBLISHED`, { cache: 'no-store' }).then(r => r.json()),
+      fetch(`${API}/api/v1/posts?limit=4&status=PUBLISHED&type=NEWS`, { cache: 'no-store' }).then(r => r.json()),
     ])
     return {
       stats: statsData.data,
