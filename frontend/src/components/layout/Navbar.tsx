@@ -110,7 +110,7 @@ export default function Navbar() {
                   </Link>
                 )}
                 <Link
-                  href={user.role === 'PUBLIC' || user.role === 'SUBSCRIBER' ? '/dashboard' : '/admin'}
+                  href={user.role === 'UNIVERSITY_ADMIN' ? '/university-admin' : user.role === 'PUBLIC' || user.role === 'SUBSCRIBER' ? '/dashboard' : '/admin'}
                   className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-brand-600 text-white text-sm font-medium hover:bg-brand-700 transition-colors"
                 >
                   <LayoutDashboard size={15} />
@@ -171,7 +171,7 @@ export default function Navbar() {
                     </Link>
                   )}
                   <Link
-                    href={user.role === 'PUBLIC' || user.role === 'SUBSCRIBER' ? '/dashboard' : '/admin'}
+                    href={user.role === 'UNIVERSITY_ADMIN' ? '/university-admin' : user.role === 'PUBLIC' || user.role === 'SUBSCRIBER' ? '/dashboard' : '/admin'}
                     onClick={() => setMobileOpen(false)}
                     className="block px-4 py-2.5 text-sm text-gray-700 font-medium"
                   >
