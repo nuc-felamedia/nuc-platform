@@ -47,8 +47,9 @@ router.post('/seed-directors', async (req: any, res: any) => {
 router.post('/directorates/:id/divisions', async (req: any, res: any) => {
   const { prisma } = require('../utils/prisma')
   try {
+    const slug = req.body.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
     const div = await prisma.division.create({ 
-      data: { ...req.body, directorateId: req.params.id } 
+      data: { ...req.body, slug, directorateId: req.params.id } 
     })
     res.json({ success: true, data: div })
   } catch (e: any) {
@@ -93,8 +94,9 @@ router.patch('/directorates/:id', async (req: any, res: any) => {
 router.post('/directorates/:id/divisions', async (req: any, res: any) => {
   const { prisma } = require('../utils/prisma')
   try {
+    const slug = req.body.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
     const div = await prisma.division.create({ 
-      data: { ...req.body, directorateId: req.params.id } 
+      data: { ...req.body, slug, directorateId: req.params.id } 
     })
     res.json({ success: true, data: div })
   } catch (e: any) {
