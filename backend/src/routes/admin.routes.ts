@@ -15,10 +15,6 @@ router.post('/seed-directors', async (req: any, res: any) => {
   const dirs = [
     { slug: 'academic-planning', name: 'Mallam Abubakar Muhammad Girei', title: 'Director, Academic Planning', photo: 'https://www.nuc.edu.ng/wp-content/uploads/2025/06/MNM_3044.jpg' },
     { slug: 'inspection-and-monitoring', name: 'Mrs. Justina Onyema Emerole', title: 'Director, Inspection & Monitoring', photo: 'https://www.nuc.edu.ng/wp-content/uploads/2026/01/Mrs.-Emerole-scaled.jpg' },
-    { slug: 'inspection', name: 'Mrs. Justina Onyema Emerole', title: 'Director, Inspection & Monitoring', photo: 'https://www.nuc.edu.ng/wp-content/uploads/2026/01/Mrs.-Emerole-scaled.jpg' },
-    { slug: 'ict-and-digital-services', name: 'Mal. Lawal Mohammed Faruk', title: 'Director, Research Innovations & IT', photo: 'https://www.nuc.edu.ng/wp-content/uploads/2025/06/MNM_3043-e1750085770353.jpg' },
-    { slug: 'finance-and-accounts', name: 'Dr. Zakariya Sini Kwanta', title: 'Director, Finance and Accounts', photo: 'https://www.nuc.edu.ng/wp-content/uploads/2026/01/Dr.-Zachary-Kwanta.jpeg' },
-    { slug: 'research-and-innovation', name: 'Mal. Lawal Mohammed Faruk', title: 'Director, Research Innovations & IT', photo: 'https://www.nuc.edu.ng/wp-content/uploads/2025/06/MNM_3043-e1750085770353.jpg' },
     { slug: 'finance-accounts', name: 'Dr. Zakariya Sini Kwanta', title: 'Director, Finance and Accounts', photo: 'https://www.nuc.edu.ng/wp-content/uploads/2026/01/Dr.-Zachary-Kwanta.jpeg' },
     { slug: 'human-resources', name: 'Mrs. Alissabatu Balogun', title: 'Director, Human Resources', photo: 'https://www.nuc.edu.ng/wp-content/uploads/2026/02/Mrs-Balogun.jpg' },
     { slug: 'ict', name: 'Mal. Lawal Mohammed Faruk', title: 'Director, Research Innovations & IT', photo: 'https://www.nuc.edu.ng/wp-content/uploads/2025/06/MNM_3043-e1750085770353.jpg' },
@@ -43,98 +39,47 @@ router.post('/seed-directors', async (req: any, res: any) => {
   res.json({ success: true, results, slugsInDB: all.map((x: any) => x.slug) })
 })
 
-// Division management
+// Division routes
 router.post('/directorates/:id/divisions', async (req: any, res: any) => {
   const { prisma } = require('../utils/prisma')
   try {
     const slug = req.body.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
-    const div = await prisma.division.create({ 
-      data: { ...req.body, slug, directorateId: req.params.id } 
-    })
+    const div = await prisma.division.create({ data: { ...req.body, slug, directorateId: req.params.id } })
     res.json({ success: true, data: div })
-  } catch (e: any) {
-    res.status(400).json({ success: false, message: e.message })
-  }
+  } catch (e: any) { res.status(400).json({ success: false, message: e.message }) }
 })
 
-// Directorate management
+router.patch('/divisions/:id', async (req: any, res: any) => {
+  const { prisma } = require('../utils/prisma')
+  try {
+    const div = await prisma.division.update({ where: { id: req.params.id }, data: req.body })
+    res.json({ success: true, data: div })
+  } catch (e: any) { res.status(400).json({ success: false, message: e.message }) }
+})
+
+// Directorate routes
 router.post('/directorates', async (req: any, res: any) => {
   const { prisma } = require('../utils/prisma')
   try {
     const dir = await prisma.directorate.create({ data: req.body })
     res.json({ success: true, data: dir })
-  } catch (e: any) {
-    res.status(400).json({ success: false, message: e.message })
-  }
+  } catch (e: any) { res.status(400).json({ success: false, message: e.message }) }
 })
+
 router.delete('/directorates/:id', async (req: any, res: any) => {
   const { prisma } = require('../utils/prisma')
   try {
     await prisma.directorate.delete({ where: { id: req.params.id } })
     res.json({ success: true, message: 'Directorate deleted' })
-  } catch (e: any) {
-    res.status(400).json({ success: false, message: e.message })
-  }
+  } catch (e: any) { res.status(400).json({ success: false, message: e.message }) }
 })
 
 router.patch('/directorates/:id', async (req: any, res: any) => {
   const { prisma } = require('../utils/prisma')
   try {
-    const updated = await prisma.directorate.update({
-      where: { id: req.params.id },
-      data: req.body
-    })
+    const updated = await prisma.directorate.update({ where: { id: req.params.id }, data: req.body })
     res.json({ success: true, data: updated })
-  } catch (e: any) {
-    res.status(400).json({ success: false, message: e.message })
-  }
-})
-
-// Division management
-router.post('/directorates/:id/divisions', async (req: any, res: any) => {
-  const { prisma } = require('../utils/prisma')
-  try {
-    const slug = req.body.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
-    const div = await prisma.division.create({ 
-      data: { ...req.body, slug, directorateId: req.params.id } 
-    })
-    res.json({ success: true, data: div })
-  } catch (e: any) {
-    res.status(400).json({ success: false, message: e.message })
-  }
-})
-
-// Directorate management
-router.post('/directorates', async (req: any, res: any) => {
-  const { prisma } = require('../utils/prisma')
-  try {
-    const dir = await prisma.directorate.create({ data: req.body })
-    res.json({ success: true, data: dir })
-  } catch (e: any) {
-    res.status(400).json({ success: false, message: e.message })
-  }
-})
-router.delete('/directorates/:id', async (req: any, res: any) => {
-  const { prisma } = require('../utils/prisma')
-  try {
-    await prisma.directorate.delete({ where: { id: req.params.id } })
-    res.json({ success: true, message: 'Directorate deleted' })
-  } catch (e: any) {
-    res.status(400).json({ success: false, message: e.message })
-  }
-})
-
-router.patch('/directorates/:id', async (req: any, res: any) => {
-  const { prisma } = require('../utils/prisma')
-  try {
-    const updated = await prisma.directorate.update({
-      where: { id: req.params.id },
-      data: req.body
-    })
-    res.json({ success: true, data: updated })
-  } catch (e: any) {
-    res.status(400).json({ success: false, message: e.message })
-  }
+  } catch (e: any) { res.status(400).json({ success: false, message: e.message }) }
 })
 
 export default router
