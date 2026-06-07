@@ -44,6 +44,15 @@ router.post('/seed-directors', async (req: any, res: any) => {
 })
 
 // Directorate management
+router.post('/directorates', async (req: any, res: any) => {
+  const { prisma } = require('../utils/prisma')
+  try {
+    const dir = await prisma.directorate.create({ data: req.body })
+    res.json({ success: true, data: dir })
+  } catch (e: any) {
+    res.status(400).json({ success: false, message: e.message })
+  }
+})
 router.delete('/directorates/:id', async (req: any, res: any) => {
   const { prisma } = require('../utils/prisma')
   try {
@@ -68,6 +77,15 @@ router.patch('/directorates/:id', async (req: any, res: any) => {
 })
 
 // Directorate management
+router.post('/directorates', async (req: any, res: any) => {
+  const { prisma } = require('../utils/prisma')
+  try {
+    const dir = await prisma.directorate.create({ data: req.body })
+    res.json({ success: true, data: dir })
+  } catch (e: any) {
+    res.status(400).json({ success: false, message: e.message })
+  }
+})
 router.delete('/directorates/:id', async (req: any, res: any) => {
   const { prisma } = require('../utils/prisma')
   try {
