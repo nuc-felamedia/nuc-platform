@@ -8,19 +8,30 @@ import slugify from 'slugify'
 const router = Router()
 
 router.get('/', async (req, res) => {
+  const page = Math.max(1, Number(req.query.page) || 1)
+  const limit = Math.min(100, Number(req.query.limit) || 20)
+  const skip = (page - 1) * limit
   const where: any = { isActive: true }
   if (req.query.universityId) where.universityId = req.query.universityId
   if (req.query.facultyId) where.facultyId = req.query.facultyId
-  if (req.query.q) where.name = { contains: req.query.q as string, mode: 'insensitive' }
-  const programs = await prisma.program.findMany({
-    where, orderBy: { name: 'asc' },
-    include: {
-      university: { select: { name: true, slug: true } },
-      faculty: { select: { name: true } },
-      accreditations: { where: { isCurrent: true }, select: { status: true, year: true, expiryDate: true } },
-    },
-  })
-  return successResponse(res, programs)
+  if (req.query.degreeType) where.degreeType = req.query.degreeType
+  if (req.query.q) where.OR = [
+    { name: { contains: req.query.q as string, mode: 'insensitive' } },
+    { university: { name: { contains: req.query.q as string, mode: 'insensitive' } } },
+  ]
+  const [programs, total] = await Promise.all([
+    prisma.program.findMany({
+      where, orderBy: { name: 'asc' }, skip, take: limit,
+      include: {
+        university: { select: { name: true, slug: true } },
+        faculty: { select: { name: true } },
+        accreditations: { where: { isCurrent: true }, select: { status: true, year: true, expiryDate: true } },
+      },
+    }),
+    prisma.program.count({ where }),
+  ])
+  const totalPages = Math.ceil(total / limit)
+  return res.json({ success: true, message: 'Success', data: programs, pagination: { total, page, limit, totalPages } })
 })
 
 router.get('/:id', async (req, res) => {
