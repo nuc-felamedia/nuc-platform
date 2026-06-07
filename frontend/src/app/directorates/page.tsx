@@ -1,14 +1,35 @@
 'use client'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Mail, Phone } from 'lucide-react'
+import { Mail, ChevronDown, ChevronRight, Building2 } from 'lucide-react'
 import PublicLayout from '@/components/layout/PublicLayout'
 import { api } from '@/lib/api'
 
+function Accordion({ title, children }: { title: string; children: React.ReactNode }) {
+  const [open, setOpen] = useState(false)
+  return (
+    <div className="border border-gray-100 rounded-xl overflow-hidden mb-2">
+      <button
+        onClick={() => setOpen(!open)}
+        className="w-full flex items-center justify-between px-5 py-4 bg-white hover:bg-gray-50 transition-colors text-left"
+      >
+        <span className="font-semibold text-gray-800 text-sm">{title}</span>
+        <ChevronDown size={16} className={`text-gray-400 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
+      </button>
+      {open && (
+        <div className="px-5 pb-5 pt-2 bg-gray-50 border-t border-gray-100 text-sm text-gray-600 leading-relaxed">
+          {children}
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function DirectoratesPage() {
   const [directorates, setDirectorates] = useState<any[]>([])
-  const [loading, setLoading]           = useState(true)
-  const [selected, setSelected]         = useState<string | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [selected, setSelected] = useState<string | null>(null)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   useEffect(() => {
     api.get('/directorates').then(res => {
@@ -22,181 +43,183 @@ export default function DirectoratesPage() {
 
   if (loading) return (
     <PublicLayout>
-      <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ width: 36, height: 36, border: '3px solid #e5e7eb', borderTopColor: '#1d4ed8', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
-        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <div className="w-9 h-9 border-[3px] border-gray-200 border-t-brand-600 rounded-full animate-spin" />
       </div>
     </PublicLayout>
   )
 
   return (
     <PublicLayout>
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '40px 20px 80px' }}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
 
         {/* Header */}
-        <div style={{ marginBottom: 36 }}>
-          <h1 style={{ fontSize: 32, fontWeight: 800, color: '#111827', margin: '0 0 8px' }}>Directorates</h1>
-          <p style={{ fontSize: 15, color: '#6b7280', margin: '0 0 16px' }}>
-            The National Universities Commission is organised into directorates that oversee different aspects of university education in Nigeria.
+        <div className="mb-8">
+          <div className="text-xs font-semibold text-brand-600 uppercase tracking-widest mb-2">Structure</div>
+          <h1 className="font-display text-3xl sm:text-4xl font-bold text-gray-900 mb-3">Directorates</h1>
+          <p className="text-gray-500 max-w-2xl leading-relaxed">
+            The National Universities Commission is organised into 13 directorates that oversee different aspects of university education in Nigeria.
           </p>
-          <Link href="/profile/setup" style={{
-            display: 'inline-flex', alignItems: 'center', gap: 6,
-            background: '#eff6ff', color: '#1d4ed8', fontSize: 13, fontWeight: 600,
-            padding: '8px 16px', borderRadius: 20, textDecoration: 'none', border: '1px solid #bfdbfe',
-          }}>
-            NUC Staff? Set up your profile →
-          </Link>
         </div>
 
         {directorates.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '60px 20px', color: '#9ca3af' }}>
-            <div style={{ fontSize: 48, marginBottom: 12 }}>🏛️</div>
-            <div style={{ fontSize: 16, fontWeight: 600, color: '#374151', marginBottom: 8 }}>No directorates yet</div>
+          <div className="text-center py-20 text-gray-400">
+            <Building2 size={40} className="mx-auto mb-4 opacity-30" />
+            <p>No directorates found</p>
           </div>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: '260px 1fr', gap: 24, alignItems: 'start' }}>
+          <div className="lg:grid lg:grid-cols-[280px_1fr] lg:gap-8 lg:items-start">
 
-            {/* Sidebar */}
-            <div style={{ background: '#fff', border: '1px solid #f1f5f9', borderRadius: 16, overflow: 'hidden', position: 'sticky', top: 20 }}>
-              <div style={{ padding: '14px 16px', borderBottom: '1px solid #f1f5f9', fontSize: 11, fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                All directorates
-              </div>
-              {directorates.map(dir => {
-                const staffCount = dir.divisions?.reduce((n: number, d: any) => n + (d.staff?.length || 0), 0) || 0
-                const isActive = selected ? selected === dir.id : directorates[0]?.id === dir.id
-                return (
-                  <button key={dir.id} onClick={() => setSelected(dir.id)} style={{
-                    width: '100%', padding: '12px 16px', border: 'none', textAlign: 'left',
-                    background: isActive ? '#eff6ff' : '#fff', cursor: 'pointer',
-                    borderBottom: '1px solid #f9fafb',
-                    borderLeft: isActive ? '3px solid #1d4ed8' : '3px solid transparent',
-                  }}>
-                    <div style={{ fontSize: 13, fontWeight: isActive ? 700 : 500, color: isActive ? '#1d4ed8' : '#374151', lineHeight: 1.3 }}>
+            {/* Mobile directorate selector */}
+            <div className="lg:hidden mb-6">
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="w-full flex items-center justify-between px-4 py-3 bg-white border border-gray-200 rounded-xl font-medium text-gray-800"
+              >
+                <span>{activeDir?.name || 'Select directorate'}</span>
+                <ChevronDown size={18} className={`transition-transform ${mobileMenuOpen ? 'rotate-180' : ''}`} />
+              </button>
+              {mobileMenuOpen && (
+                <div className="mt-2 bg-white border border-gray-100 rounded-xl overflow-hidden shadow-lg z-10 relative">
+                  {directorates.map(dir => (
+                    <button key={dir.id}
+                      onClick={() => { setSelected(dir.id); setMobileMenuOpen(false) }}
+                      className={`w-full text-left px-4 py-3 text-sm border-b border-gray-50 last:border-0 transition-colors
+                        ${(selected ? selected === dir.id : directorates[0]?.id === dir.id)
+                          ? 'bg-brand-50 text-brand-700 font-semibold'
+                          : 'text-gray-700 hover:bg-gray-50'}`}
+                    >
                       {dir.name}
-                    </div>
-                    {staffCount > 0 && (
-                      <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 3 }}>{staffCount} staff</div>
-                    )}
-                  </button>
-                )
-              })}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Desktop sidebar */}
+            <div className="hidden lg:block sticky top-6">
+              <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+                <div className="px-4 py-3 border-b border-gray-50">
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest">All Directorates</p>
+                </div>
+                {directorates.map(dir => {
+                  const isActive = selected ? selected === dir.id : directorates[0]?.id === dir.id
+                  return (
+                    <button key={dir.id} onClick={() => setSelected(dir.id)}
+                      className={`w-full text-left px-4 py-3.5 text-sm border-b border-gray-50 last:border-0 transition-all
+                        ${isActive
+                          ? 'bg-brand-50 text-brand-700 font-semibold border-l-[3px] border-l-brand-600'
+                          : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 border-l-[3px] border-l-transparent'}`}
+                    >
+                      {dir.name}
+                    </button>
+                  )
+                })}
+              </div>
             </div>
 
             {/* Main content */}
             {activeDir && (
               <div>
-                {/* Directorate header card */}
-                <div style={{ background: '#fff', border: '1px solid #f1f5f9', borderRadius: 16, padding: 24, marginBottom: 20 }}>
-                  <h2 style={{ fontSize: 22, fontWeight: 800, color: '#111827', margin: '0 0 8px' }}>{activeDir.name}</h2>
-                  {activeDir.mandate && (
-                    <p style={{ fontSize: 14, color: '#6b7280', lineHeight: 1.7, margin: '0 0 20px' }}>{activeDir.mandate}</p>
-                  )}
-
-                  {/* Director profile */}
-                  {activeDir.directorName && (
-                    <div style={{ background: '#f9fafb', borderRadius: 12, padding: 16, display: 'flex', gap: 16, alignItems: 'flex-start' }}>
-                      {activeDir.directorPhotoUrl ? (
-                        <img src={activeDir.directorPhotoUrl} alt={activeDir.directorName}
-                          style={{ width: 80, height: 80, borderRadius: 12, objectFit: 'cover', flexShrink: 0, border: '1px solid #e5e7eb' }} />
-                      ) : (
-                        <div style={{
-                          width: 80, height: 80, borderRadius: 12, background: '#1d4ed8',
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          color: '#fff', fontWeight: 800, fontSize: 28, flexShrink: 0,
-                        }}>
-                          {activeDir.directorName.charAt(0)}
-                        </div>
-                      )}
-                      <div>
-                        <div style={{ fontSize: 11, fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>Director</div>
-                        <div style={{ fontSize: 16, fontWeight: 700, color: '#111827', marginBottom: 3 }}>{activeDir.directorName}</div>
-                        {activeDir.directorTitle && (
-                          <div style={{ fontSize: 13, color: '#6b7280', marginBottom: 6 }}>{activeDir.directorTitle}</div>
-                        )}
-                        {activeDir.directorEmail && (
-                          <a href={`mailto:${activeDir.directorEmail}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 12, color: '#1d4ed8', textDecoration: 'none' }}>
-                            <Mail size={12} /> {activeDir.directorEmail}
-                          </a>
-                        )}
+                {/* Director card */}
+                <div className="bg-white rounded-2xl border border-gray-100 p-6 sm:p-8 mb-6">
+                  <div className="flex flex-col sm:flex-row gap-6 items-start">
+                    {/* Photo */}
+                    {activeDir.directorPhotoUrl ? (
+                      <img
+                        src={activeDir.directorPhotoUrl}
+                        alt={activeDir.directorName}
+                        className="w-24 h-24 sm:w-32 sm:h-32 rounded-2xl object-cover object-top border border-gray-100 shrink-0"
+                      />
+                    ) : (
+                      <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-2xl bg-brand-50 border border-brand-100 flex items-center justify-center shrink-0">
+                        <Building2 size={32} className="text-brand-300" />
                       </div>
+                    )}
+
+                    <div className="flex-1 min-w-0">
+                      <div className="text-xs font-semibold text-brand-600 uppercase tracking-widest mb-2">
+                        {activeDir.name}
+                      </div>
+                      {activeDir.directorName ? (
+                        <>
+                          <h2 className="font-display text-xl sm:text-2xl font-bold text-gray-900 mb-1">
+                            {activeDir.directorName}
+                          </h2>
+                          <p className="text-brand-600 font-medium text-sm mb-3">{activeDir.directorTitle}</p>
+                        </>
+                      ) : (
+                        <h2 className="font-display text-xl font-bold text-gray-900 mb-3">{activeDir.name}</h2>
+                      )}
+                      {activeDir.directorEmail && (
+                        <a href={`mailto:${activeDir.directorEmail}`}
+                          className="inline-flex items-center gap-2 text-sm text-brand-600 hover:text-brand-700">
+                          <Mail size={14} /> {activeDir.directorEmail}
+                        </a>
+                      )}
                     </div>
+                  </div>
+                </div>
+
+                {/* Info accordions */}
+                <div className="mb-6">
+                  {activeDir.description && (
+                    <Accordion title="About this Directorate">
+                      <p>{activeDir.description}</p>
+                    </Accordion>
+                  )}
+                  {activeDir.vision && (
+                    <Accordion title="Vision">
+                      <p>{activeDir.vision}</p>
+                    </Accordion>
+                  )}
+                  {activeDir.mandate && (
+                    <Accordion title="Mandate & Functions">
+                      <p>{activeDir.mandate}</p>
+                    </Accordion>
                   )}
                 </div>
 
-                {/* Divisions and staff */}
-                {activeDir.divisions?.length > 0 ? (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                    {activeDir.divisions.map((division: any) => (
-                      <div key={division.id} style={{ background: '#fff', border: '1px solid #f1f5f9', borderRadius: 16, overflow: 'hidden' }}>
-                        <div style={{ padding: '14px 20px', borderBottom: division.staff?.length > 0 ? '1px solid #f9fafb' : 'none', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                          <div>
-                            <div style={{ fontSize: 15, fontWeight: 700, color: '#111827' }}>{division.name}</div>
-                            {division.description && <div style={{ fontSize: 12, color: '#9ca3af', marginTop: 2 }}>{division.description}</div>}
-                          </div>
+                {/* Divisions */}
+                {activeDir.divisions?.length > 0 && (
+                  <div>
+                    <h3 className="font-display text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                      <ChevronRight size={18} className="text-brand-600" />
+                      Directorate Divisions
+                    </h3>
+                    <div className="space-y-2">
+                      {activeDir.divisions.map((division: any) => (
+                        <Accordion key={division.id} title={division.name}>
+                          {division.description && <p className="mb-3">{division.description}</p>}
                           {division.staff?.length > 0 && (
-                            <div style={{ fontSize: 11, color: '#9ca3af', background: '#f9fafb', padding: '3px 10px', borderRadius: 20 }}>
-                              {division.staff.length} staff
+                            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                              {division.staff.map((member: any) => (
+                                <div key={member.id} className="flex items-center gap-3 p-3 bg-white rounded-xl border border-gray-100">
+                                  {member.photoUrl ? (
+                                    <img src={member.photoUrl} alt={member.name}
+                                      className="w-10 h-10 rounded-full object-cover shrink-0 border border-gray-100" />
+                                  ) : (
+                                    <div className="w-10 h-10 rounded-full bg-indigo-50 flex items-center justify-center shrink-0">
+                                      <span className="text-sm font-bold text-indigo-400">{member.name?.[0]}</span>
+                                    </div>
+                                  )}
+                                  <div className="min-w-0">
+                                    <div className="text-sm font-semibold text-gray-900 truncate">{member.name}</div>
+                                    {member.title && <div className="text-xs text-gray-500 truncate">{member.title}</div>}
+                                  </div>
+                                </div>
+                              ))}
                             </div>
                           )}
-                        </div>
-
-                        {division.staff?.length > 0 && (
-                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 1, background: '#f9fafb' }}>
-                            {division.staff.map((member: any) => (
-                              <div key={member.id} style={{ background: '#fff', padding: '14px 16px', display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-                                {member.photoUrl ? (
-                                  <img src={member.photoUrl} alt={member.name}
-                                    style={{ width: 44, height: 44, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '1px solid #e5e7eb' }} />
-                                ) : (
-                                  <div style={{
-                                    width: 44, height: 44, borderRadius: '50%', background: '#e0e7ff',
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    fontSize: 16, fontWeight: 700, color: '#4338ca', flexShrink: 0,
-                                  }}>
-                                    {member.name?.charAt(0) || '?'}
-                                  </div>
-                                )}
-                                <div style={{ minWidth: 0 }}>
-                                  <div style={{ fontSize: 13, fontWeight: 600, color: '#111827', lineHeight: 1.3 }}>{member.name}</div>
-                                  {member.title && <div style={{ fontSize: 11, color: '#6b7280', marginTop: 2 }}>{member.title}</div>}
-                                  {member.email && (
-                                    <a href={`mailto:${member.email}`} style={{ fontSize: 11, color: '#1d4ed8', marginTop: 2, display: 'block' }}>
-                                      {member.email}
-                                    </a>
-                                  )}
-                                  {member.phone && (
-                                    <div style={{ fontSize: 11, color: '#6b7280', marginTop: 2, display: 'flex', alignItems: 'center', gap: 3 }}>
-                                      <Phone size={10} /> {member.phone}
-                                    </div>
-                                  )}
-                                  {member.bio && (
-                                    <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 4, lineHeight: 1.5 }}>
-                                      {member.bio.slice(0, 120)}{member.bio.length > 120 ? '...' : ''}
-                                    </div>
-                                  )}
-                                  {member.linkedin && (
-                                    <a href={member.linkedin} target="_blank" rel="noopener noreferrer"
-                                      style={{ fontSize: 11, color: '#0077b5', marginTop: 3, display: 'block' }}>LinkedIn →</a>
-                                  )}
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-
-                        {(!division.staff || division.staff.length === 0) && (
-                          <div style={{ padding: '16px 20px', fontSize: 13, color: '#9ca3af', fontStyle: 'italic' }}>
-                            No staff profiles yet —{' '}
-                            <Link href="/profile/setup" style={{ color: '#1d4ed8' }}>staff can add their profile here</Link>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div style={{ padding: '32px', textAlign: 'center', color: '#9ca3af', fontSize: 14 }}>
-                    No divisions configured yet.
+                          {(!division.staff || division.staff.length === 0) && (
+                            <p className="text-gray-400 italic text-xs mt-2">
+                              No staff profiles yet.{' '}
+                              <Link href="/profile/setup" className="text-brand-600">Staff can add their profile here</Link>
+                            </p>
+                          )}
+                        </Accordion>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>
