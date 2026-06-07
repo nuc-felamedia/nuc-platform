@@ -57,9 +57,22 @@ export default function DirectoratesPage() {
         <div className="mb-8">
           <div className="text-xs font-semibold text-brand-600 uppercase tracking-widest mb-2">Structure</div>
           <h1 className="font-display text-3xl sm:text-4xl font-bold text-gray-900 mb-3">Directorates</h1>
-          <p className="text-gray-500 max-w-2xl leading-relaxed">
+          <p className="text-gray-500 max-w-2xl leading-relaxed mb-4">
             The National Universities Commission is organised into 13 directorates that oversee different aspects of university education in Nigeria.
           </p>
+          <div className="inline-flex items-start gap-3 bg-blue-50 border border-blue-100 rounded-xl px-4 py-3 max-w-xl">
+            <span className="text-blue-500 text-lg shrink-0">ℹ️</span>
+            <div>
+              <p className="text-sm font-semibold text-blue-800 mb-1">NUC Staff? Set up your profile</p>
+              <p className="text-xs text-blue-600 leading-relaxed">
+                NUC staff members can create a personal profile page on this platform showing their name, photo, role and directorate. 
+                Your profile will appear in your directorate listing and help the public identify the people behind each department.
+              </p>
+              <a href="/profile/setup" className="inline-block mt-2 text-xs font-semibold text-blue-700 hover:text-blue-800 underline">
+                Create your staff profile →
+              </a>
+            </div>
+          </div>
         </div>
 
         {directorates.length === 0 ? (
