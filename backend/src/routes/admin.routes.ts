@@ -43,6 +43,19 @@ router.post('/seed-directors', async (req: any, res: any) => {
   res.json({ success: true, results, slugsInDB: all.map((x: any) => x.slug) })
 })
 
+// Division management
+router.post('/directorates/:id/divisions', async (req: any, res: any) => {
+  const { prisma } = require('../utils/prisma')
+  try {
+    const div = await prisma.division.create({ 
+      data: { ...req.body, directorateId: req.params.id } 
+    })
+    res.json({ success: true, data: div })
+  } catch (e: any) {
+    res.status(400).json({ success: false, message: e.message })
+  }
+})
+
 // Directorate management
 router.post('/directorates', async (req: any, res: any) => {
   const { prisma } = require('../utils/prisma')
@@ -71,6 +84,19 @@ router.patch('/directorates/:id', async (req: any, res: any) => {
       data: req.body
     })
     res.json({ success: true, data: updated })
+  } catch (e: any) {
+    res.status(400).json({ success: false, message: e.message })
+  }
+})
+
+// Division management
+router.post('/directorates/:id/divisions', async (req: any, res: any) => {
+  const { prisma } = require('../utils/prisma')
+  try {
+    const div = await prisma.division.create({ 
+      data: { ...req.body, directorateId: req.params.id } 
+    })
+    res.json({ success: true, data: div })
   } catch (e: any) {
     res.status(400).json({ success: false, message: e.message })
   }
