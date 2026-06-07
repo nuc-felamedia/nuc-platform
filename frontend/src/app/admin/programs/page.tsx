@@ -6,11 +6,18 @@ import { PageLoader, EmptyState } from '@/components/ui'
 import { formatDateShort } from '@/lib/utils'
 
 export default function AdminProgramsPage() {
+  const [page, setPage] = useState(1)
+  const [q, setQ] = useState('')
+  const [search, setSearch] = useState('')
+
   const { data, isLoading } = useQuery({
-    queryKey: ['admin-programs'],
-    queryFn: () => api.get('/programs?limit=50'),
-    select: (res) => res.data?.data || [],
+    queryKey: ['admin-programs', search, page],
+    queryFn: () => api.get('/programs', { params: { q: search, page, limit: 50 } }),
+    select: (res) => res.data,
   })
+
+  const programs = data?.data || []
+  const pagination = data?.pagination
 
   if (isLoading) return <PageLoader />
 
@@ -19,7 +26,7 @@ export default function AdminProgramsPage() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="font-display text-2xl font-bold text-gray-900">Programs</h1>
-          <p className="text-gray-500 text-sm mt-1">{data?.length || 0} programs loaded</p>
+          <p className="text-gray-500 text-sm mt-1">{pagination?.total || 0} programs loaded</p>
         </div>
         <Link href="/admin/programs/new"
           className="px-4 py-2 bg-brand-600 text-white rounded-lg text-sm font-medium hover:bg-brand-700 transition-colors">
@@ -27,8 +34,16 @@ export default function AdminProgramsPage() {
         </Link>
       </div>
 
+      <div className="flex gap-3 mb-4">
+        <input type="text" placeholder="Search programs..." value={q} onChange={e => setQ(e.target.value)}
+          onKeyDown={e => e.key === 'Enter' && (setSearch(q), setPage(1))}
+          className="flex-1 px-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500" />
+        <button onClick={() => { setSearch(q); setPage(1) }}
+          className="px-4 py-2 bg-brand-600 text-white rounded-xl text-sm font-medium">Search</button>
+      </div>
+
       <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
-        {!data?.length ? (
+        {!programs.length ? (
           <EmptyState title="No programs found" description="Programs will appear here" />
         ) : (
           <div className="overflow-x-auto">
@@ -43,7 +58,7 @@ export default function AdminProgramsPage() {
                 </tr>
               </thead>
               <tbody>
-                {data.map((prog: any) => {
+                {programs.map((prog: any) => {
                   const accr = prog.accreditations?.[0]
                   return (
                     <tr key={prog.id} className="border-b border-gray-50 hover:bg-gray-50">
@@ -72,6 +87,16 @@ export default function AdminProgramsPage() {
           </div>
         )}
       </div>
+
+      {pagination && pagination.totalPages > 1 && (
+        <div className="flex items-center justify-center gap-3 mt-6">
+          <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}
+            className="px-4 py-2 text-sm border border-gray-200 rounded-lg disabled:opacity-40 hover:bg-gray-50">← Prev</button>
+          <span className="text-sm text-gray-500">Page {page} of {pagination.totalPages} ({pagination.total.toLocaleString()} total)</span>
+          <button onClick={() => setPage(p => Math.min(pagination.totalPages, p + 1))} disabled={page === pagination.totalPages}
+            className="px-4 py-2 text-sm border border-gray-200 rounded-lg disabled:opacity-40 hover:bg-gray-50">Next →</button>
+        </div>
+      )}
     </div>
   )
 }
