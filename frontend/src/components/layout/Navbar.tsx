@@ -15,6 +15,7 @@ const NAV_LINKS = [
     children: [
       { label: 'Search results', href: '/accreditation' },
       { label: 'Verify a program', href: '/accreditation/verify' },
+      { label: 'Approved Programs', href: '/approved-programmes' },
     ],
   },
   { label: 'Directorates', href: '/directorates' },
