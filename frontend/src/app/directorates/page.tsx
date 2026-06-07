@@ -190,7 +190,9 @@ export default function DirectoratesPage() {
                     <div className="space-y-2">
                       {activeDir.divisions.map((division: any) => (
                         <Accordion key={division.id} title={division.name}>
-                          {division.description && <p className="mb-3">{division.description}</p>}
+                          {division.description && (
+                        <div className="mb-3 whitespace-pre-line">{division.description}</div>
+                      )}
                           {division.staff?.length > 0 && (
                             <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
                               {division.staff.map((member: any) => (
