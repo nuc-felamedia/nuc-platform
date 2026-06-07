@@ -144,16 +144,8 @@ export async function getMyUniversity(req: Request, res: Response) {
 
   const university = await prisma.university.findUnique({
     where: { id: uniId },
-    include: {
-      programs: {
-        orderBy: { name: 'asc' },
-        include: {
-          faculty: true,
-          accreditations: { where: { isCurrent: true }, select: { status: true, year: true, expiryDate: true } },
-        },
-      },
-    },
   })
+  if (!university) return errorResponse(res, 'University not found in database', 404)
   return successResponse(res, university)
 }
 
