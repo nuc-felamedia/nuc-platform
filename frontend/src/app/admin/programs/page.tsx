@@ -13,7 +13,7 @@ export default function AdminProgramsPage() {
   const { data, isLoading } = useQuery({
     queryKey: ['admin-programs', search, page],
     queryFn: () => api.get('/programs', { params: { q: search, page, limit: 50 } }),
-    select: (res) => res.data,
+    select: (res) => ({ data: res.data.data, pagination: res.data.pagination }),
   })
 
   const programs = data?.data || []
