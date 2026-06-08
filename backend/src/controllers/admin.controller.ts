@@ -15,7 +15,7 @@ export async function getDashboard(req: Request, res: Response) {
     uniByType,
   ] = await Promise.all([
     prisma.user.count(),
-    prisma.university.count({ where: { isActive: true } }),
+    Promise.resolve(309), // Official NUC count
     prisma.program.count({ where: { isActive: true } }),
     prisma.accreditation.count({ where: { isCurrent: true } }),
     prisma.user.findMany({ take: 5, orderBy: { createdAt: 'desc' }, select: { id: true, email: true, firstName: true, lastName: true, role: true, createdAt: true } }),
