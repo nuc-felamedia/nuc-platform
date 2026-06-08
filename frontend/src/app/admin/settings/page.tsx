@@ -104,9 +104,17 @@ export default function AdminSettingsPage() {
               className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none"
             />
             <div className="flex gap-3">
-              <button onClick={() => toast.success('Announcement feature coming soon')}
+              <button onClick={async () => {
+                if (!announcement.trim()) { toast.error('Enter a message first'); return }
+                setSaving(true)
+                try {
+                  await api.put('/admin/settings', { key: 'announcement', value: JSON.stringify({ message: announcement, type: announcementType }) })
+                  toast.success('Announcement published!')
+                } catch { toast.error('Failed to publish') }
+                setSaving(false)
+              }}
                 className="flex-1 py-2 bg-brand-600 text-white rounded-xl text-sm font-medium hover:bg-brand-700 transition-colors">
-                Publish announcement
+                {saving ? 'Publishing...' : 'Publish announcement'}
               </button>
               <button onClick={() => setAnnouncement('')}
                 className="px-4 py-2 border border-gray-200 rounded-xl text-sm text-gray-600 hover:bg-gray-50">

@@ -10,6 +10,7 @@ import rateLimit from 'express-rate-limit'
 import dotenv from 'dotenv'
 
 import { errorHandler } from './middleware/errorHandler'
+import { prisma } from './utils/prisma'
 import { notFound } from './middleware/notFound'
 import { logger } from './utils/logger'
 
@@ -78,6 +79,16 @@ app.use('/api/v1/api-keys', apiKeyRoutes)
 
 // ── Error Handling ──
 app.use(notFound)
+// Public settings endpoint
+app.get('/api/v1/settings/announcement', async (req, res) => {
+  try {
+    const setting = await prisma.siteSetting.findUnique({ where: { key: 'announcement' } })
+    res.json({ success: true, data: setting ? JSON.parse(setting.value) : null })
+  } catch (e) {
+    res.json({ success: true, data: null })
+  }
+})
+
 app.use(errorHandler)
 
 app.listen(PORT, () => {

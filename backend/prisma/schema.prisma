@@ -366,3 +366,10 @@ model PlatformStat {
   pendingPrograms    Int      @default(0)
   updatedAt          DateTime @updatedAt
 }
+
+model SiteSetting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String
+  updatedAt DateTime @updatedAt
+}

@@ -82,4 +82,28 @@ router.patch('/directorates/:id', async (req: any, res: any) => {
   } catch (e: any) { res.status(400).json({ success: false, message: e.message }) }
 })
 
+// Site settings
+router.get('/settings', async (req: any, res: any) => {
+  const { prisma } = require('../utils/prisma')
+  try {
+    const settings = await prisma.siteSetting.findMany()
+    const obj: any = {}
+    settings.forEach((s: any) => { obj[s.key] = s.value })
+    res.json({ success: true, data: obj })
+  } catch (e: any) { res.status(400).json({ success: false, message: e.message }) }
+})
+
+router.put('/settings', async (req: any, res: any) => {
+  const { prisma } = require('../utils/prisma')
+  try {
+    const { key, value } = req.body
+    const setting = await prisma.siteSetting.upsert({
+      where: { key },
+      update: { value },
+      create: { key, value }
+    })
+    res.json({ success: true, data: setting })
+  } catch (e: any) { res.status(400).json({ success: false, message: e.message }) }
+})
+
 export default router
