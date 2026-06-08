@@ -22,6 +22,7 @@ const NAV = [
   { label: 'Directorates', icon: FolderOpen, href: '/admin/directorates' },
   { label: 'Posts',        icon: FileText,   href: '/admin/posts' },
   { label: 'Users',        icon: Users,      href: '/admin/users' },
+  { label: 'Carousel',     icon: Settings,   href: '/admin/carousel' },
   { label: 'Settings',     icon: Settings,   href: '/admin/settings' },
 ]
 

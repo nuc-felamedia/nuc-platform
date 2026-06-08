@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import HeroCarousel from '@/components/layout/HeroCarousel'
 import { ArrowRight, Search, CheckCircle, BookOpen, Building2, Globe, FileText, Users, ChevronRight } from 'lucide-react'
 import PublicLayout from '@/components/layout/PublicLayout'
 import SearchBar from '@/components/search/SearchBar'
@@ -29,7 +30,8 @@ export default async function HomePage() {
     <PublicLayout>
 
       {/* ── HERO ── */}
-      <section className="bg-brand-800 text-white">
+      <HeroCarousel />
+      <section className="bg-brand-800 text-white" style={{display:'none'}}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-14 sm:py-20">
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 bg-brand-700 border border-brand-600 rounded-full px-4 py-1.5 text-xs font-semibold text-brand-200 mb-6 uppercase tracking-widest">
