@@ -75,8 +75,6 @@ export default function HeroCarousel({ slides }: Props) {
         <div className="max-w-7xl mx-auto px-4 sm:px-8 w-full">
           <div className="max-w-2xl">
             <div className="flex items-center gap-2 mb-4">
-              <img src="/nuc-logo.png" alt="NUC" style={{height: '32px', width: 'auto', filter: 'brightness(0) invert(1)', opacity: 0.8}} />
-              <span style={{color: '#86efac', fontSize: '11px', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase'}}>Federal Republic of Nigeria</span>
             </div>
             <h1 style={{fontSize: 'clamp(28px, 4vw, 52px)', fontWeight: 800, color: 'white', lineHeight: 1.15, marginBottom: '16px'}}>
               {slide.title}
