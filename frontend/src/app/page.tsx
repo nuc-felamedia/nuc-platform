@@ -13,7 +13,7 @@ async function getHomeData() {
     ])
     return {
       stats: statsData.data,
-      posts: postsData.data?.data || [],
+      posts: postsData.data || [],
       carousel: carouselData.data?.carousel_slides ? JSON.parse(carouselData.data.carousel_slides) : [],
     }
   } catch {
