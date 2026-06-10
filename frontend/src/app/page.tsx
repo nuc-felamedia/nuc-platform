@@ -1,331 +1,149 @@
 import Link from 'next/link'
+import { ArrowRight, Building2, CheckCircle, FileText, Globe, Users, BookOpen, ChevronRight } from 'lucide-react'
+import { SearchBar } from '@/components/ui'
 import HeroCarousel from '@/components/layout/HeroCarousel'
-import { ArrowRight, Search, CheckCircle, BookOpen, Building2, Globe, FileText, Users, ChevronRight } from 'lucide-react'
-import PublicLayout from '@/components/layout/PublicLayout'
-import SearchBar from '@/components/search/SearchBar'
-import { statsApi, universitiesApi, postsApi } from '@/lib/api'
 
 async function getHomeData() {
   try {
     const API = process.env.NEXT_PUBLIC_API_URL || 'https://nuc-platform-production.up.railway.app'
-    const [statsData, unisData, postsData] = await Promise.all([
+    const [statsData, postsData, carouselData] = await Promise.all([
       fetch(`${API}/api/v1/stats`, { cache: 'no-store' }).then(r => r.json()),
-      fetch(`${API}/api/v1/universities?limit=6`, { cache: 'no-store' }).then(r => r.json()),
-      fetch(`${API}/api/v1/posts?limit=4&status=PUBLISHED&type=NEWS`, { cache: 'no-store' }).then(r => r.json()),
+      fetch(`${API}/api/v1/posts?limit=3&status=PUBLISHED&type=NEWS`, { cache: 'no-store' }).then(r => r.json()),
+      fetch(`${API}/api/v1/settings/announcement`, { cache: 'no-store' }).then(r => r.json()).catch(() => ({ data: null })),
     ])
     return {
       stats: statsData.data,
-      universities: unisData.data?.data || [],
       posts: postsData.data?.data || [],
+      carousel: carouselData.data?.carousel_slides ? JSON.parse(carouselData.data.carousel_slides) : [],
     }
   } catch {
-    return { stats: null, universities: [], posts: [] }
+    return { stats: null, posts: [], carousel: [] }
   }
 }
 
 export default async function HomePage() {
-  const { stats, universities, posts } = await getHomeData()
+  const { stats, posts, carousel } = await getHomeData()
+
+  const STAT_ITEMS = [
+    { label: 'Total Universities', value: stats?.totalUniversities || 309, href: '/universities' },
+    { label: 'Federal Universities', value: stats?.federalCount || 74, href: '/universities?type=FEDERAL' },
+    { label: 'State Universities', value: stats?.stateCount || 67, href: '/universities?type=STATE' },
+    { label: 'Private Universities', value: stats?.privateCount || 168, href: '/universities?type=PRIVATE' },
+  ]
+
+  const SERVICES = [
+    { title: 'University Directory', desc: 'Browse all 309 NUC-approved universities by type, state and accreditation status.', href: '/universities', icon: Building2, tag: '309 universities' },
+    { title: 'Accreditation Results', desc: 'Full searchable database of accreditation records for all programmes.', href: '/accreditation', icon: CheckCircle, tag: 'Searchable database' },
+    { title: 'Approved Programs', desc: 'Search all NUC-approved programmes across Nigerian universities.', href: '/approved-programmes', icon: BookOpen, tag: '5,357 programs' },
+    { title: 'Bulletins & Circulars', desc: 'Official NUC announcements, press releases and circulars.', href: '/bulletins', icon: FileText, tag: 'Latest news' },
+    { title: 'Guidelines & Documents', desc: 'Download official NUC guidelines, statistical digests and policy documents.', href: '/guidelines', icon: Globe, tag: 'Free downloads' },
+    { title: 'Directorates', desc: 'Explore NUC departments, divisions, directors and staff.', href: '/directorates', icon: Users, tag: '13 directorates' },
+  ]
 
   return (
-    <PublicLayout>
+    <main>
+      {/* ── HERO CAROUSEL ── */}
+      <HeroCarousel slides={carousel} />
 
-      {/* ── HERO ── */}
-      <HeroCarousel />
-      <section className="bg-brand-800 text-white" style={{display:'none'}}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-14 sm:py-20">
-          <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 bg-brand-700 border border-brand-600 rounded-full px-4 py-1.5 text-xs font-semibold text-brand-200 mb-6 uppercase tracking-widest">
-              <span className="w-1.5 h-1.5 rounded-full bg-brand-400 animate-pulse" />
-              Federal Republic of Nigeria
-            </div>
-            <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight mb-4 text-white">
-              National Universities Commission
-            </h1>
-            <p className="text-brand-200 text-lg sm:text-xl leading-relaxed mb-3 max-w-2xl">
-              The regulatory body for university education in Nigeria. Ensuring quality, promoting excellence, and protecting the integrity of Nigerian degrees.
+      {/* ── STATS BAR ── */}
+      <section style={{background: '#052e16', borderBottom: '1px solid #14532d'}}>
+        <div style={{maxWidth: 1200, margin: '0 auto', padding: '0 24px'}}>
+          <div style={{display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)'}}>
+            {STAT_ITEMS.map((s, i) => (
+              <Link key={s.label} href={s.href} style={{
+                display: 'block', padding: '20px 24px', textDecoration: 'none', textAlign: 'center',
+                borderRight: i < 3 ? '1px solid #14532d' : 'none',
+                transition: 'background 0.2s',
+              }}>
+                <div style={{fontSize: 'clamp(24px, 3vw, 36px)', fontWeight: 800, color: 'white', lineHeight: 1}}>{s.value.toLocaleString()}</div>
+                <div style={{fontSize: 11, color: '#86efac', textTransform: 'uppercase', letterSpacing: '0.08em', marginTop: 6, fontWeight: 600}}>{s.label}</div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── ES SECTION ── */}
+      <section style={{background: 'white', borderBottom: '1px solid #f1f5f9', padding: '64px 24px'}}>
+        <div style={{maxWidth: 1100, margin: '0 auto', display: 'flex', flexDirection: 'row', gap: 56, alignItems: 'center', flexWrap: 'wrap'}}>
+          <div style={{flexShrink: 0}}>
+            <img src="/es-photo.jpg" alt="Prof. Abdullahi Yusufu Ribadu"
+              style={{width: 240, height: 300, objectFit: 'cover', objectPosition: 'top', borderRadius: 20, border: '1px solid #e2e8f0'}} />
+          </div>
+          <div style={{flex: 1, minWidth: 280}}>
+            <div style={{fontSize: 11, fontWeight: 700, color: '#16a34a', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12}}>Message from the Executive Secretary</div>
+            <h2 style={{fontSize: 'clamp(22px, 2.5vw, 32px)', fontWeight: 800, color: '#111827', marginBottom: 6, lineHeight: 1.2}}>Prof. Abdullahi Yusufu Ribadu, FCVSN</h2>
+            <p style={{fontSize: 14, color: '#16a34a', fontWeight: 600, marginBottom: 20}}>Executive Secretary, National Universities Commission</p>
+            <p style={{fontSize: 15, color: '#4b5563', lineHeight: 1.8, marginBottom: 16}}>
+              Born in Fufore, Adamawa State on September 2nd, 1960, Professor Abdullahi Yusufu Ribadu, FCVSN embodies a lifelong dedication to education and a relentless pursuit of excellence. A distinguished veterinary scientist, he holds a DVM from Ahmadu Bello University, a PhD from the University of Liverpool, and a postdoctoral fellowship from Rakuno Gakuen University, Japan.
             </p>
-            <p className="text-brand-300 text-sm mb-8">
-              Executive Secretary: Prof. Abdullahi Yusufu Ribadu, FCVSN
+            <p style={{fontSize: 15, color: '#4b5563', lineHeight: 1.8, marginBottom: 28}}>
+              As Executive Secretary of NUC, Professor Ribadu is implementing a seven-point agenda focused on increasing access, enhancing funding, driving digitisation, strengthening quality assurance, promoting innovation and research, stabilising the academic calendar, and revisiting NUC laws.
             </p>
-            <div className="max-w-2xl">
-              <SearchBar placeholder="Search universities, programs, accreditation status..." large />
-            </div>
-            <div className="flex flex-wrap gap-3 mt-5">
-              {['Computer Science', 'Medicine & Surgery', 'Law', 'Engineering', 'Pharmacy'].map((term) => (
-                <Link key={term} href={`/search?q=${encodeURIComponent(term)}`}
-                  className="px-3 py-1.5 bg-brand-700 hover:bg-brand-600 text-brand-200 hover:text-white rounded-full text-xs font-medium transition-colors border border-brand-600">
-                  {term}
-                </Link>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── LIVE STATS BAR ── */}
-      <section className="bg-brand-900 text-white border-b border-brand-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-brand-700">
-            {[
-              { label: 'Total universities', value: stats?.totalUniversities || 309 },
-              { label: 'Federal universities', value: stats?.federalCount || 74 },
-              { label: 'State universities', value: stats?.stateCount || 67 },
-              { label: 'Private universities', value: stats?.privateCount || 100 },
-            ].map(({ label, value }) => (
-              <div key={label} className="px-4 sm:px-8 py-5 text-center">
-                <div className="font-display text-2xl sm:text-3xl font-bold text-white">{value.toLocaleString()}</div>
-                <div className="text-xs text-brand-300 mt-1 font-medium uppercase tracking-wide">{label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── FOR WHOM ── */}
-      <section className="py-12 bg-white border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="flex flex-col md:flex-row items-center gap-12 justify-center">
-            <div className="shrink-0">
-              <img src="/es-photo.jpg" alt="Prof. Abdullahi Yusufu Ribadu" className="w-72 h-80 object-cover object-top rounded-2xl border border-gray-100" />
-            </div>
-            <div>
-                <div className="text-xs font-semibold text-brand-600 uppercase tracking-widest mb-3">Message from the Executive Secretary</div>
-                <h2 className="font-display text-2xl font-bold text-gray-900 mb-1">Prof. Abdullahi Yusufu Ribadu, FCVSN</h2>
-                <p className="text-sm text-brand-600 font-medium mb-4">Executive Secretary, National Universities Commission</p>
-                <p className="text-gray-600 leading-relaxed max-w-2xl mb-3">
-                  Born in Fufore, Adamawa State on September 2nd, 1960, Professor Abdullahi Yusufu Ribadu, FCVSN embodies a lifelong
-                  dedication to education and a relentless pursuit of excellence. A distinguished veterinary scientist, he holds a DVM
-                  from Ahmadu Bello University, a PhD from the University of Liverpool, and a postdoctoral fellowship from Rakuno Gakuen
-                  University, Japan. He served as Vice-Chancellor of the Federal University of Technology, Yola (2004–2009) and
-                  Jigawa State University (2013), and is a Fellow of the College of Veterinary Surgeons of Nigeria (FCVSN).
-                </p>
-                <p className="text-gray-600 leading-relaxed max-w-2xl mb-5">
-                  As Executive Secretary of NUC, Professor Ribadu is implementing a seven-point agenda focused on increasing access,
-                  enhancing funding, driving digitisation, strengthening quality assurance, promoting innovation and research,
-                  stabilising the academic calendar, and revisiting NUC laws — all in service of transforming the Nigerian University System.
-                </p>
-                <a href="/about/executive-secretary" className="inline-flex items-center gap-2 text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 px-4 py-2 rounded-lg transition-colors">
-                  Read full profile →
-                </a>
-                <div className="mt-5 pt-4 border-t border-gray-100 text-sm text-gray-400">
-                  Plot 430, Aguiyi Ironsi Street, Maitama District, Abuja, FCT · info@nuc.edu.ng · www.nuc.edu.ng
-                </div>
-              </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="bg-gray-50 border-b border-gray-100 py-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-5">I am looking for information as a...</p>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            {[
-              { icon: Users, label: 'Student or parent', desc: 'Verify accreditation, find approved programs', href: '/accreditation/verify', color: 'bg-blue-50 border-blue-100 hover:border-blue-300 text-blue-700' },
-              { icon: Building2, label: 'University', desc: 'Submit data, check status, manage programs', href: '/auth/login', color: 'bg-green-50 border-green-100 hover:border-green-300 text-green-700' },
-              { icon: Globe, label: 'Embassy or institution', desc: 'Verify Nigerian degrees and credentials — login required', href: '/auth/login?returnTo=/accreditation', color: 'bg-purple-50 border-purple-100 hover:border-purple-300 text-purple-700' },
-            ].map(({ icon: Icon, label, desc, href, color }) => (
-              <Link key={label} href={href}
-                className={`group flex flex-col gap-3 p-5 rounded-2xl border bg-white transition-all hover:shadow-sm ${color.split(' ').filter(c => c.startsWith('hover') || c.startsWith('border')).join(' ')} border`}>
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${color.split(' ').filter(c => c.startsWith('bg')).join(' ')}`}>
-                  <Icon size={18} className={color.split(' ').find(c => c.startsWith('text-')) || 'text-gray-600'} />
-                </div>
-                <div>
-                  <div className="font-semibold text-gray-900 text-sm mb-0.5">{label}</div>
-                  <div className="text-xs text-gray-500 leading-relaxed">{desc}</div>
-                </div>
-                <div className="flex items-center gap-1 text-xs font-medium text-brand-600 mt-auto">
-                  Get started <ChevronRight size={12} />
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── ACCREDITATION CHECKER FEATURE ── */}
-      <section className="py-12 bg-white border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
-            <div>
-              <div className="inline-block text-xs font-bold text-brand-700 bg-brand-50 px-3 py-1 rounded-full uppercase tracking-widest mb-4">
-                Most used feature
-              </div>
-              <h2 className="font-display text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
-                Verify Approved Programs
-              </h2>
-              <p className="text-gray-500 leading-relaxed mb-6">
-                Search and verify NUC-approved programmes across all Nigerian universities. Find out if a programme is approved before you apply or enrol.
-              </p>
-              <div className="space-y-3 mb-8">
-                {[
-                  'Select the university',
-                  'Select the program',
-                  'Check if a programme is NUC-approved',
-                ].map((step, i) => (
-                  <div key={step} className="flex items-center gap-3">
-                    <div className="w-6 h-6 rounded-full bg-brand-600 text-white text-xs font-bold flex items-center justify-center shrink-0">
-                      {i + 1}
-                    </div>
-                    <span className="text-sm text-gray-700 font-medium">{step}</span>
-                  </div>
-                ))}
-              </div>
-              <Link href="/accreditation"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-brand-600 text-white rounded-xl font-semibold text-sm hover:bg-brand-700 transition-colors">
-                Search approved programmes <ArrowRight size={16} />
-              </Link>
-            </div>
-            <div className="bg-gray-50 rounded-2xl border border-gray-100 p-6">
-              <div className="space-y-3">
-                {[
-                  { uni: 'University of Lagos', prog: 'Computer Science', status: 'FULL', year: 2023 },
-                  { uni: 'University of Ibadan', prog: 'Medicine & Surgery', status: 'FULL', year: 2024 },
-                  { uni: 'Ahmadu Bello University', prog: 'Law', status: 'FULL', year: 2023 },
-                  { uni: 'University of Nigeria', prog: 'Pharmacy', status: 'FULL', year: 2023 },
-                  { uni: 'Obafemi Awolowo University', prog: 'Engineering', status: 'INTERIM', year: 2022 },
-                ].map((item) => (
-                  <div key={item.prog} className="bg-white rounded-xl border border-gray-100 p-3.5 flex items-center justify-between gap-3">
-                    <div className="min-w-0">
-                      <div className="font-semibold text-gray-900 text-sm truncate">{item.prog}</div>
-                      <div className="text-xs text-gray-400 truncate">{item.uni}</div>
-                    </div>
-                    <div className="flex items-center gap-2 shrink-0">
-                      <span className="text-xs text-gray-400">{item.year}</span>
-                      <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${item.status === 'FULL' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
-                        <span className={`w-1.5 h-1.5 rounded-full ${item.status === 'FULL' ? 'bg-green-500' : 'bg-yellow-500'}`} />
-                        {item.status === 'FULL' ? 'Accredited' : 'Interim'}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-                <Link href="/accreditation"
-                  className="block text-center text-xs text-brand-600 font-medium hover:text-brand-700 pt-1">
-                  View all accreditation records →
-                </Link>
-              </div>
+            <Link href="/about/executive-secretary" style={{
+              display: 'inline-flex', alignItems: 'center', gap: 8,
+              background: '#15803d', color: 'white', fontWeight: 700,
+              padding: '12px 24px', borderRadius: 12, fontSize: 14, textDecoration: 'none'
+            }}>
+              Read full profile →
+            </Link>
+            <div style={{marginTop: 20, fontSize: 13, color: '#9ca3af'}}>
+              Plot 430, Aguiyi Ironsi Street, Maitama District, Abuja, FCT · info@nuc.edu.ng · www.nuc.edu.ng
             </div>
           </div>
         </div>
       </section>
-
-      {/* ── QUICK LINKS ── */}
-      <section className="py-12 bg-gray-50 border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <h2 className="font-display text-xl font-bold text-gray-900 mb-6">Key services</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[
-              { title: 'University directory', desc: 'Browse all 309 NUC-approved universities by type, state and accreditation status.', href: '/universities', icon: Building2, tag: '309 universities' },
-              { title: 'Accreditation results', desc: 'Full searchable database of undergraduate and postgraduate accreditation records.', href: '/accreditation', icon: CheckCircle, tag: 'Searchable database' },
-              { title: 'Directorates', desc: 'Explore NUC departments, divisions, directors and staff across all directorates.', href: '/directorates', icon: Users, tag: '15+ directorates' },
-              { title: 'Bulletins & circulars', desc: 'Official NUC announcements, press releases and circulars for universities.', href: '/bulletins', icon: FileText, tag: 'Latest news' },
-              { title: 'Guidelines & documents', desc: 'Download official NUC guidelines, statistical digests and policy documents.', href: '/documents', icon: BookOpen, tag: 'Free downloads' },
-              { title: 'Part-time programmes', desc: 'Guidelines and accreditation status for all approved part-time programmes.', href: '/accreditation?type=parttime', icon: Globe, tag: 'Federal, State & Private' },
-            ].map(({ title, desc, href, icon: Icon, tag }) => (
-              <Link key={title} href={href}
-                className="group bg-white rounded-2xl border border-gray-100 p-5 hover:border-brand-200 hover:shadow-sm transition-all">
-                <div className="flex items-start justify-between mb-3">
-                  <div className="w-10 h-10 rounded-xl bg-brand-50 flex items-center justify-center group-hover:bg-brand-100 transition-colors">
-                    <Icon size={18} className="text-brand-600" />
-                  </div>
-                  <span className="text-xs text-gray-400 font-medium bg-gray-50 px-2 py-1 rounded-full">{tag}</span>
-                </div>
-                <h3 className="font-semibold text-gray-900 mb-1.5 group-hover:text-brand-700 transition-colors">{title}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed">{desc}</p>
-                <div className="flex items-center gap-1 text-xs text-brand-600 font-medium mt-3">
-                  Learn more <ArrowRight size={11} className="group-hover:translate-x-0.5 transition-transform" />
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── ACCREDITATION OVERVIEW ── */}
-      {stats && (
-        <section className="py-12 bg-white border-b border-gray-100">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="font-display text-xl font-bold text-gray-900">Accreditation overview</h2>
-              <Link href="/accreditation" className="text-sm text-brand-600 font-medium hover:text-brand-700">
-                Full results →
-              </Link>
-            </div>
-            <div className="bg-gray-50 rounded-2xl border border-gray-100 p-6">
-              <div className="flex items-center justify-between mb-3 text-sm">
-                <span className="font-semibold text-gray-700">
-                  {stats.accreditationRate}% of all programs are fully accredited
-                </span>
-                <span className="text-gray-400">{(stats.totalPrograms || 0).toLocaleString()} programs assessed</span>
-              </div>
-              <div className="flex h-4 rounded-full overflow-hidden gap-0.5 mb-4">
-                <div className="bg-green-500 transition-all rounded-l-full" style={{ flex: stats.accreditedPrograms }} />
-                <div className="bg-yellow-400" style={{ flex: stats.interimPrograms }} />
-                <div className="bg-red-400 rounded-r-full" style={{ flex: stats.deniedPrograms }} />
-              </div>
-              <div className="grid grid-cols-3 gap-4 text-center">
-                {[
-                  { label: 'Full accreditation', value: stats.accreditedPrograms, color: 'text-green-700', bg: 'bg-green-50', dot: 'bg-green-500' },
-                  { label: 'Interim', value: stats.interimPrograms, color: 'text-yellow-700', bg: 'bg-yellow-50', dot: 'bg-yellow-400' },
-                  { label: 'Denied', value: stats.deniedPrograms, color: 'text-red-700', bg: 'bg-red-50', dot: 'bg-red-400' },
-                ].map(({ label, value, color, bg, dot }) => (
-                  <div key={label} className={`${bg} rounded-xl p-4`}>
-                    <div className="flex items-center justify-center gap-1.5 mb-1">
-                      <span className={`w-2 h-2 rounded-full ${dot}`} />
-                      <span className={`font-display text-2xl font-bold ${color}`}>{(value || 0).toLocaleString()}</span>
-                    </div>
-                    <div className={`text-xs font-medium ${color} opacity-80`}>{label}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
 
       {/* ── LATEST NEWS ── */}
       {posts.length > 0 && (
-        <section className="py-12 bg-gray-50 border-b border-gray-100">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="font-display text-xl font-bold text-gray-900">Latest from NUC</h2>
-              <Link href="/bulletins" className="text-sm text-brand-600 font-medium hover:text-brand-700 flex items-center gap-1">
-                All bulletins <ArrowRight size={13} />
+        <section style={{background: '#f8fafc', borderBottom: '1px solid #e2e8f0', padding: '64px 24px'}}>
+          <div style={{maxWidth: 1100, margin: '0 auto'}}>
+            <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 36}}>
+              <div>
+                <div style={{fontSize: 11, fontWeight: 700, color: '#16a34a', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8}}>Stay informed</div>
+                <h2 style={{fontSize: 'clamp(22px, 2.5vw, 30px)', fontWeight: 800, color: '#111827'}}>Latest from NUC</h2>
+              </div>
+              <Link href="/bulletins" style={{display: 'flex', alignItems: 'center', gap: 6, fontSize: 14, color: '#15803d', fontWeight: 600, textDecoration: 'none'}}>
+                View all news <ArrowRight size={16} />
               </Link>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 24}}>
               {posts.map((post: any, i: number) => {
+                const thumb = post.featuredImage || (post.content?.match(/src="(https?:\/\/[^"]+\.(jpg|jpeg|png|webp)[^"]*)"/i)?.[1])
                 const typeColors: Record<string, string> = {
-                  NEWS: 'bg-blue-100 text-blue-700',
-                  BULLETIN: 'bg-green-100 text-green-700',
-                  PRESS_RELEASE: 'bg-purple-100 text-purple-700',
-                  CIRCULAR: 'bg-orange-100 text-orange-700',
-                  ANNOUNCEMENT: 'bg-teal-100 text-teal-700',
+                  NEWS: '#1d4ed8', BULLETIN: '#15803d', PRESS_RELEASE: '#7c3aed', CIRCULAR: '#c2410c', ANNOUNCEMENT: '#0f766e'
+                }
+                const typeBg: Record<string, string> = {
+                  NEWS: '#eff6ff', BULLETIN: '#f0fdf4', PRESS_RELEASE: '#f5f3ff', CIRCULAR: '#fff7ed', ANNOUNCEMENT: '#f0fdfa'
                 }
                 return (
-                  <Link key={post.id} href={`/bulletins/${post.slug}`}
-                    className={`group bg-white rounded-2xl border border-gray-100 hover:border-brand-200 hover:shadow-sm transition-all overflow-hidden flex flex-col ${i === 0 ? 'sm:col-span-2' : ''}`}>
-                    {i === 0 && (
-                      <div className="h-3 bg-gradient-to-r from-brand-600 to-brand-400" />
-                    )}
-                    <div className="p-5 flex flex-col flex-1">
-                      <div className="flex items-center justify-between mb-3">
-                        <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${typeColors[post.type] || 'bg-gray-100 text-gray-600'}`}>
-                          {post.type}
-                        </span>
-                        {post.publishedAt && (
-                          <span className="text-xs text-gray-400">
-                            {new Date(post.publishedAt).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric' })}
-                          </span>
-                        )}
+                  <Link key={post.id} href={`/bulletins/${post.slug}`} style={{textDecoration: 'none', display: 'flex', flexDirection: 'column', background: 'white', borderRadius: 20, border: '1px solid #e2e8f0', overflow: 'hidden', transition: 'box-shadow 0.2s, border-color 0.2s'}}>
+                    <div style={{height: 200, overflow: 'hidden', background: '#f1f5f9', position: 'relative'}}>
+                      {thumb ? (
+                        <img src={thumb} alt={post.title} style={{width: '100%', height: '100%', objectFit: 'cover'}} />
+                      ) : (
+                        <div style={{width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f0fdf4'}}>
+                          <img src="/nuc-logo.png" alt="NUC" style={{height: 60, opacity: 0.15}} />
+                        </div>
+                      )}
+                      <div style={{position: 'absolute', top: 12, right: 12, background: 'white/90', backdropFilter: 'blur(4px)', padding: '2px 8px', borderRadius: 8, fontSize: 11, fontWeight: 600, color: '#374151'}}>
+                        {post.publishedAt ? new Date(post.publishedAt).getFullYear() : ''}
                       </div>
-                      <h3 className={`font-semibold text-gray-900 group-hover:text-brand-700 transition-colors leading-tight mb-2 ${i === 0 ? 'text-base' : 'text-sm line-clamp-2'}`}>
+                    </div>
+                    <div style={{padding: 20, flex: 1, display: 'flex', flexDirection: 'column'}}>
+                      <span style={{display: 'inline-block', fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 20, marginBottom: 12, background: typeBg[post.type] || '#f1f5f9', color: typeColors[post.type] || '#374151'}}>
+                        {post.type}
+                      </span>
+                      <h3 style={{fontSize: 15, fontWeight: 700, color: '#111827', lineHeight: 1.45, marginBottom: 10, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden'}}>
                         {post.title}
                       </h3>
                       {post.excerpt && (
-                        <p className="text-sm text-gray-500 line-clamp-2 leading-relaxed flex-1">{post.excerpt}</p>
+                        <p style={{fontSize: 13, color: '#6b7280', lineHeight: 1.6, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', flex: 1}}>
+                          {post.excerpt}
+                        </p>
                       )}
-                      <div className="flex items-center gap-1 text-xs text-brand-600 font-medium mt-3">
-                        Read more <ArrowRight size={11} />
+                      <div style={{display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#15803d', fontWeight: 600, marginTop: 16}}>
+                        Read more <ArrowRight size={12} />
                       </div>
                     </div>
                   </Link>
@@ -336,95 +154,138 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* ── ABOUT NUC ── */}
-      <section className="py-12 bg-white border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
-            <div>
-              <div className="text-xs font-bold text-brand-700 bg-brand-50 px-3 py-1 rounded-full uppercase tracking-widest mb-4 inline-block">
-                About NUC
+      {/* ── KEY SERVICES ── */}
+      <section style={{background: 'white', borderBottom: '1px solid #f1f5f9', padding: '64px 24px'}}>
+        <div style={{maxWidth: 1100, margin: '0 auto'}}>
+          <div style={{textAlign: 'center', marginBottom: 48}}>
+            <div style={{fontSize: 11, fontWeight: 700, color: '#16a34a', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10}}>What we offer</div>
+            <h2 style={{fontSize: 'clamp(24px, 3vw, 36px)', fontWeight: 800, color: '#111827', marginBottom: 12}}>Key Services</h2>
+            <p style={{fontSize: 16, color: '#6b7280', maxWidth: 520, margin: '0 auto', lineHeight: 1.7}}>
+              Everything you need to navigate Nigerian university education — all in one platform.
+            </p>
+          </div>
+          <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 20}}>
+            {SERVICES.map(service => {
+              const Icon = service.icon
+              return (
+                <Link key={service.title} href={service.href} style={{
+                  display: 'flex', flexDirection: 'column', padding: 24,
+                  background: 'white', borderRadius: 20, border: '1.5px solid #e2e8f0',
+                  textDecoration: 'none', transition: 'all 0.2s',
+                }}>
+                  <div style={{display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 16}}>
+                    <div style={{width: 44, height: 44, borderRadius: 12, background: '#f0fdf4', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                      <Icon size={22} color="#15803d" />
+                    </div>
+                    <span style={{fontSize: 11, fontWeight: 600, color: '#15803d', background: '#f0fdf4', padding: '3px 10px', borderRadius: 20}}>
+                      {service.tag}
+                    </span>
+                  </div>
+                  <h3 style={{fontSize: 17, fontWeight: 700, color: '#111827', marginBottom: 8}}>{service.title}</h3>
+                  <p style={{fontSize: 13, color: '#6b7280', lineHeight: 1.65, flex: 1}}>{service.desc}</p>
+                  <div style={{display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#15803d', fontWeight: 600, marginTop: 16}}>
+                    Learn more <ArrowRight size={13} />
+                  </div>
+                </Link>
+              )
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* ── ACCREDITATION OVERVIEW ── */}
+      {stats && (
+        <section style={{background: '#052e16', padding: '64px 24px'}}>
+          <div style={{maxWidth: 1100, margin: '0 auto'}}>
+            <div style={{display: 'flex', flexWrap: 'wrap', gap: 48, alignItems: 'center', justifyContent: 'space-between'}}>
+              <div style={{flex: 1, minWidth: 260}}>
+                <div style={{fontSize: 11, fontWeight: 700, color: '#86efac', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12}}>Accreditation overview</div>
+                <h2 style={{fontSize: 'clamp(24px, 3vw, 36px)', fontWeight: 800, color: 'white', marginBottom: 16}}>
+                  {stats.accreditationRate}% of all programs are fully accredited
+                </h2>
+                <p style={{color: '#86efac', fontSize: 15, marginBottom: 28}}>{(stats.totalPrograms || 0).toLocaleString()} programs assessed across all Nigerian universities</p>
+                <Link href="/accreditation" style={{display: 'inline-flex', alignItems: 'center', gap: 8, background: 'white', color: '#14532d', fontWeight: 700, padding: '12px 24px', borderRadius: 12, fontSize: 14, textDecoration: 'none'}}>
+                  View full results →
+                </Link>
               </div>
-              <h2 className="font-display text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
-                Nigeria's foremost higher education regulatory body
-              </h2>
-              <p className="text-gray-500 leading-relaxed mb-4">
-                The National Universities Commission (NUC) was established in 1962 to advise the Federal Government on the funding needs of universities and ensure quality university education in Nigeria.
-              </p>
-              <p className="text-gray-500 leading-relaxed mb-6">
-                Today, NUC regulates 309 approved universities across Nigeria, ensuring they meet minimum academic standards and protecting the value of Nigerian degrees globally.
-              </p>
-              <div className="grid grid-cols-2 gap-4 mb-6">
+              <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, flex: 1, minWidth: 260, maxWidth: 420}}>
                 {[
-                  { label: 'Year established', value: '1962' },
-                  { label: 'Universities regulated', value: '309' },
-                  { label: 'Programs accredited', value: '3,800+' },
-                  { label: 'Annual inspections', value: '500+' },
-                ].map(({ label, value }) => (
-                  <div key={label} className="bg-gray-50 rounded-xl p-4 border border-gray-100">
-                    <div className="font-display text-xl font-bold text-brand-700">{value}</div>
-                    <div className="text-xs text-gray-500 mt-0.5">{label}</div>
+                  { label: 'Full Accreditation', value: stats.accreditedPrograms, color: '#4ade80', bg: 'rgba(74,222,128,0.1)' },
+                  { label: 'Interim', value: stats.interimPrograms, color: '#fbbf24', bg: 'rgba(251,191,36,0.1)' },
+                  { label: 'Denied', value: stats.deniedPrograms, color: '#f87171', bg: 'rgba(248,113,113,0.1)' },
+                  { label: 'Total Programs', value: stats.totalPrograms, color: '#93c5fd', bg: 'rgba(147,197,253,0.1)' },
+                ].map(item => (
+                  <div key={item.label} style={{background: item.bg, border: `1px solid ${item.color}30`, borderRadius: 16, padding: '20px 16px', textAlign: 'center'}}>
+                    <div style={{fontSize: 28, fontWeight: 800, color: item.color}}>{(item.value || 0).toLocaleString()}</div>
+                    <div style={{fontSize: 11, color: 'rgba(255,255,255,0.6)', marginTop: 6, fontWeight: 500}}>{item.label}</div>
                   </div>
                 ))}
               </div>
-              <div className="flex flex-wrap gap-3">
-                <Link href="/about"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-brand-600 text-white rounded-xl font-semibold text-sm hover:bg-brand-700 transition-colors">
-                  About NUC <ArrowRight size={14} />
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ── ABOUT NUC ── */}
+      <section style={{background: '#f8fafc', padding: '64px 24px'}}>
+        <div style={{maxWidth: 1100, margin: '0 auto'}}>
+          <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 48, alignItems: 'center'}}>
+            <div>
+              <div style={{fontSize: 11, fontWeight: 700, color: '#16a34a', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12}}>About NUC</div>
+              <h2 style={{fontSize: 'clamp(22px, 2.5vw, 32px)', fontWeight: 800, color: '#111827', marginBottom: 16, lineHeight: 1.3}}>
+                Nigeria's foremost higher education regulatory body
+              </h2>
+              <p style={{fontSize: 15, color: '#4b5563', lineHeight: 1.8, marginBottom: 16}}>
+                The National Universities Commission (NUC) was established in 1962 to advise the Federal Government on the funding needs of universities and ensure quality university education in Nigeria.
+              </p>
+              <p style={{fontSize: 15, color: '#4b5563', lineHeight: 1.8, marginBottom: 28}}>
+                Today, NUC regulates 309 approved universities across Nigeria, ensuring they meet minimum academic standards and protecting the value of Nigerian degrees globally.
+              </p>
+              <div style={{display: 'flex', gap: 12, flexWrap: 'wrap'}}>
+                <Link href="/about" style={{display: 'inline-flex', alignItems: 'center', gap: 8, background: '#15803d', color: 'white', fontWeight: 700, padding: '12px 24px', borderRadius: 12, fontSize: 14, textDecoration: 'none'}}>
+                  About NUC →
                 </Link>
-                <Link href="/directorates"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 border border-gray-200 text-gray-700 rounded-xl font-semibold text-sm hover:bg-gray-50 transition-colors">
+                <Link href="/directorates" style={{display: 'inline-flex', alignItems: 'center', gap: 8, border: '1.5px solid #d1fae5', color: '#15803d', fontWeight: 600, padding: '12px 24px', borderRadius: 12, fontSize: 14, textDecoration: 'none'}}>
                   Our directorates
                 </Link>
               </div>
             </div>
-            <div className="space-y-4">
-              <div className="bg-brand-800 rounded-2xl p-6 text-white">
-                <div className="text-brand-300 text-xs font-bold uppercase tracking-widest mb-2">Vision</div>
-                <p className="text-white font-medium leading-relaxed">
-                  "To be a dynamic regulatory agency acting as a catalyst for positive change and innovation for the delivery of quality university education in Nigeria."
-                </p>
-              </div>
-              <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100">
-                <div className="text-brand-700 text-xs font-bold uppercase tracking-widest mb-2">Mission</div>
-                <p className="text-gray-700 leading-relaxed">
-                  To regulate and maintain quality assurance in university education in Nigeria through accreditation, funding advisory, capacity building, and policy development.
-                </p>
-              </div>
-              <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100">
-                <div className="text-brand-700 text-xs font-bold uppercase tracking-widest mb-2">Executive Secretary</div>
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-full bg-brand-100 flex items-center justify-center text-brand-700 font-bold text-sm shrink-0">AR</div>
-                  <div>
-                    <div className="font-semibold text-gray-900">Prof. Abdullahi Yusufu Ribadu</div>
-                    <div className="text-sm text-gray-500">FCVSN — Executive Secretary, NUC</div>
-                  </div>
+            <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16}}>
+              {[
+                { value: '1962', label: 'Year established' },
+                { value: '309', label: 'Universities regulated' },
+                { value: '3,800+', label: 'Programs accredited' },
+                { value: '13', label: 'Directorates' },
+              ].map(item => (
+                <div key={item.label} style={{background: 'white', borderRadius: 20, padding: '28px 20px', textAlign: 'center', border: '1px solid #e2e8f0'}}>
+                  <div style={{fontSize: 32, fontWeight: 800, color: '#15803d', marginBottom: 6}}>{item.value}</div>
+                  <div style={{fontSize: 12, color: '#6b7280', fontWeight: 500}}>{item.label}</div>
                 </div>
-              </div>
+              ))}
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── CTA BANNER ── */}
-      <section className="bg-brand-700 py-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-5">
-          <div>
-            <h2 className="font-display text-xl font-bold text-white mb-1">Need API access or bulk data?</h2>
-            <p className="text-brand-200 text-sm">Embassies, institutions and researchers can access NUC data programmatically.</p>
-          </div>
-          <div className="flex flex-wrap gap-3 shrink-0">
-            <Link href="/auth/register"
-              className="px-5 py-2.5 bg-white text-brand-700 rounded-xl font-semibold text-sm hover:bg-brand-50 transition-colors">
+      {/* ── CTA ── */}
+      <section style={{background: '#15803d', padding: '56px 24px'}}>
+        <div style={{maxWidth: 700, margin: '0 auto', textAlign: 'center'}}>
+          <h2 style={{fontSize: 'clamp(22px, 3vw, 32px)', fontWeight: 800, color: 'white', marginBottom: 12}}>
+            Need API access or bulk data?
+          </h2>
+          <p style={{fontSize: 16, color: '#bbf7d0', marginBottom: 32, lineHeight: 1.7}}>
+            Embassies, institutions and researchers can access NUC data programmatically.
+          </p>
+          <div style={{display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap'}}>
+            <Link href="/auth/register" style={{display: 'inline-flex', alignItems: 'center', gap: 8, background: 'white', color: '#14532d', fontWeight: 700, padding: '14px 28px', borderRadius: 12, fontSize: 15, textDecoration: 'none'}}>
               Create account
             </Link>
-            <Link href="/auth/login"
-              className="px-5 py-2.5 border border-brand-500 text-white rounded-xl font-semibold text-sm hover:bg-brand-600 transition-colors">
+            <Link href="/auth/login" style={{display: 'inline-flex', alignItems: 'center', gap: 8, border: '1.5px solid rgba(255,255,255,0.4)', color: 'white', fontWeight: 600, padding: '14px 28px', borderRadius: 12, fontSize: 15, textDecoration: 'none'}}>
               Sign in
             </Link>
           </div>
         </div>
       </section>
-
-    </PublicLayout>
+    </main>
   )
 }
