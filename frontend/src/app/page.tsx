@@ -267,22 +267,52 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── CTA ── */}
-      <section style={{background: '#15803d', padding: '56px 24px'}}>
-        <div style={{maxWidth: 700, margin: '0 auto', textAlign: 'center'}}>
-          <h2 style={{fontSize: 'clamp(22px, 3vw, 32px)', fontWeight: 800, color: 'white', marginBottom: 12}}>
-            Need API access or bulk data?
-          </h2>
-          <p style={{fontSize: 16, color: '#bbf7d0', marginBottom: 32, lineHeight: 1.7}}>
-            Embassies, institutions and researchers can access NUC data programmatically.
-          </p>
-          <div style={{display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap'}}>
-            <Link href="/auth/register" style={{display: 'inline-flex', alignItems: 'center', gap: 8, background: 'white', color: '#14532d', fontWeight: 700, padding: '14px 28px', borderRadius: 12, fontSize: 15, textDecoration: 'none'}}>
-              Create account
-            </Link>
-            <Link href="/auth/login" style={{display: 'inline-flex', alignItems: 'center', gap: 8, border: '1.5px solid rgba(255,255,255,0.4)', color: 'white', fontWeight: 600, padding: '14px 28px', borderRadius: 12, fontSize: 15, textDecoration: 'none'}}>
-              Sign in
-            </Link>
+      {/* ── FIND US ── */}
+      <section style={{background: '#052e16', padding: '0', overflow: 'hidden'}}>
+        <div style={{maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))'}}>
+          {/* Contact info */}
+          <div style={{padding: '56px 40px', display: 'flex', flexDirection: 'column', justifyContent: 'center'}}>
+            <div style={{fontSize: 11, fontWeight: 700, color: '#86efac', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12}}>Find us</div>
+            <h2 style={{fontSize: 'clamp(22px, 2.5vw, 30px)', fontWeight: 800, color: 'white', marginBottom: 24, lineHeight: 1.3}}>
+              National Universities Commission Headquarters
+            </h2>
+            <div style={{space: 16}}>
+              {[
+                { icon: '📍', label: 'Address', value: 'Plot 430, Aguiyi Ironsi Street, Maitama District, Abuja, FCT' },
+                { icon: '✉️', label: 'Email', value: 'info@nuc.edu.ng' },
+                { icon: '🌐', label: 'Website', value: 'www.nuc.edu.ng' },
+                { icon: '🕐', label: 'Working hours', value: 'Monday – Friday, 8:00 AM – 5:00 PM' },
+              ].map(item => (
+                <div key={item.label} style={{display: 'flex', gap: 12, marginBottom: 16}}>
+                  <span style={{fontSize: 18, flexShrink: 0}}>{item.icon}</span>
+                  <div>
+                    <div style={{fontSize: 11, fontWeight: 600, color: '#86efac', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 2}}>{item.label}</div>
+                    <div style={{fontSize: 14, color: '#d1fae5', lineHeight: 1.5}}>{item.value}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div style={{display: 'flex', gap: 12, marginTop: 24, flexWrap: 'wrap'}}>
+              <Link href="/contact" style={{display: 'inline-flex', alignItems: 'center', gap: 8, background: 'white', color: '#14532d', fontWeight: 700, padding: '12px 24px', borderRadius: 12, fontSize: 14, textDecoration: 'none'}}>
+                Contact us →
+              </Link>
+              <Link href="/auth/register" style={{display: 'inline-flex', alignItems: 'center', gap: 8, border: '1.5px solid rgba(255,255,255,0.3)', color: 'white', fontWeight: 600, padding: '12px 24px', borderRadius: 12, fontSize: 14, textDecoration: 'none'}}>
+                Create account
+              </Link>
+            </div>
+          </div>
+          {/* Map */}
+          <div style={{minHeight: 400, position: 'relative', overflow: 'hidden'}}>
+            <iframe
+              src="https://maps.google.com/maps?q=National+Universities+Commission+Maitama+Abuja&output=embed"
+              width="100%" height="100%"
+              style={{border: 0, filter: 'grayscale(20%) contrast(1.1)', minHeight: 400}}
+              allowFullScreen loading="lazy"
+              title="NUC Location"
+            />
+            <div style={{position: 'absolute', top: 16, left: 16, background: '#052e16', color: 'white', padding: '8px 14px', borderRadius: 10, fontSize: 12, fontWeight: 600, boxShadow: '0 4px 12px rgba(0,0,0,0.3)'}}>
+              📍 NUC Headquarters, Maitama, Abuja
+            </div>
           </div>
         </div>
       </section>
