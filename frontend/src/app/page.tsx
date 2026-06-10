@@ -1,6 +1,5 @@
 import Link from 'next/link'
 import { ArrowRight, Building2, CheckCircle, FileText, Globe, Users, BookOpen, ChevronRight } from 'lucide-react'
-import { SearchBar } from '@/components/ui'
 import HeroCarousel from '@/components/layout/HeroCarousel'
 
 async function getHomeData() {
