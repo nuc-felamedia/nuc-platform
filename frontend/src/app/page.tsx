@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import PublicLayout from '@/components/layout/PublicLayout'
 import { ArrowRight, Building2, CheckCircle, FileText, Globe, Users, BookOpen, ChevronRight } from 'lucide-react'
 import HeroCarousel from '@/components/layout/HeroCarousel'
 
@@ -40,7 +41,7 @@ export default async function HomePage() {
   ]
 
   return (
-    <main>
+    <PublicLayout>
       {/* ── HERO CAROUSEL ── */}
       <HeroCarousel slides={carousel} />
 
@@ -285,6 +286,6 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
-    </main>
+    </PublicLayout>
   )
 }
