@@ -11,7 +11,7 @@ import { useRouter } from 'next/navigation'
 
 type Staff = { id: string; name: string; title?: string; email?: string; phone?: string; bio?: string; photoUrl?: string; linkedin?: string; isPublic: boolean; order: number }
 type Division = { id: string; name: string; description?: string; order: number; staff: Staff[] }
-type Directorate = { id: string; name: string; slug: string; mandate?: string; directorName?: string; directorTitle?: string; directorEmail?: string; order: number; isActive: boolean; divisions: Division[] }
+type Directorate = { id: string; name: string; slug: string; mandate?: string; description?: string; vision?: string; directorName?: string; directorTitle?: string; directorEmail?: string; directorPhotoUrl?: string; order: number; isActive: boolean; divisions: Division[] }
 
 function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) {
   return (
@@ -266,10 +266,13 @@ function DeleteStaffBtn({ id, onDone }: { id: string; onDone: () => void }) {
 function DirectorateModal({ directorate, onClose, onSaved }: { directorate: Directorate | null; onClose: () => void; onSaved: () => void }) {
   const [name, setName]                   = useState(directorate?.name || '')
   const [mandate, setMandate]             = useState(directorate?.mandate || '')
-  const [directorName, setDirectorName]   = useState(directorate?.directorName || '')
-  const [directorTitle, setDirectorTitle] = useState(directorate?.directorTitle || '')
-  const [directorEmail, setDirectorEmail] = useState(directorate?.directorEmail || '')
-  const [isActive, setIsActive]           = useState(directorate?.isActive !== false)
+  const [description, setDescription]         = useState(directorate?.description || '')
+  const [vision, setVision]                   = useState(directorate?.vision || '')
+  const [directorName, setDirectorName]       = useState(directorate?.directorName || '')
+  const [directorTitle, setDirectorTitle]     = useState(directorate?.directorTitle || '')
+  const [directorEmail, setDirectorEmail]     = useState(directorate?.directorEmail || '')
+  const [directorPhotoUrl, setDirectorPhotoUrl] = useState(directorate?.directorPhotoUrl || '')
+  const [isActive, setIsActive]               = useState(directorate?.isActive !== false)
   const [saving, setSaving]               = useState(false)
   const [error, setError]                 = useState('')
 
@@ -277,7 +280,7 @@ function DirectorateModal({ directorate, onClose, onSaved }: { directorate: Dire
     if (!name.trim()) { setError('Name is required'); return }
     setSaving(true); setError('')
     try {
-      const payload = { name, mandate, directorName, directorTitle, directorEmail, isActive }
+      const payload = { name, mandate, description, vision, directorName, directorTitle, directorEmail, directorPhotoUrl, isActive }
       if (directorate) {
         await api.put(`/directorates/${directorate.id}`, payload)
       } else {
@@ -292,12 +295,18 @@ function DirectorateModal({ directorate, onClose, onSaved }: { directorate: Dire
   return (
     <Modal title={directorate ? 'Edit directorate' : 'Add directorate'} onClose={onClose}>
       <Field label="Directorate name *" value={name} onChange={setName} placeholder="e.g. Academic Planning" />
-      <Field label="Mandate / description" value={mandate} onChange={setMandate} placeholder="What this directorate is responsible for..." multiline />
+      <Field label="Mandate / functions" value={mandate} onChange={setMandate} placeholder="What this directorate is responsible for..." multiline />
+      <Field label="Description / about" value={description} onChange={setDescription} placeholder="Brief description of the directorate..." multiline />
+      <Field label="Vision" value={vision} onChange={setVision} placeholder="Vision statement..." multiline />
       <div style={{ borderTop: '1px solid #f1f5f9', margin: '16px 0', paddingTop: 16 }}>
         <div style={{ fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 12 }}>Director details</div>
         <Field label="Director name" value={directorName} onChange={setDirectorName} placeholder="Prof. John Doe" />
         <Field label="Director title" value={directorTitle} onChange={setDirectorTitle} placeholder="Director of Academic Planning" />
         <Field label="Director email" value={directorEmail} onChange={setDirectorEmail} placeholder="director@nuc.edu.ng" type="email" />
+        <Field label="Director photo URL" value={directorPhotoUrl} onChange={setDirectorPhotoUrl} placeholder="https://example.com/photo.jpg" />
+        {directorPhotoUrl && (
+          <img src={directorPhotoUrl} alt="Director" style={{ width: 80, height: 80, borderRadius: 12, objectFit: 'cover', marginBottom: 12, border: '1px solid #e5e7eb' }} />
+        )}
       </div>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 14px', background: '#f9fafb', borderRadius: 8, marginBottom: 16 }}>
         <div style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>Active</div>
