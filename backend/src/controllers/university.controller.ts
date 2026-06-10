@@ -97,9 +97,14 @@ export async function createUniversity(req: Request, res: Response) {
 }
 
 export async function updateUniversity(req: Request, res: Response) {
+  const data = { ...req.body }
+  if (data.yearEstablished) data.yearEstablished = parseInt(data.yearEstablished) || null
+  if (data.studentPopulation) data.studentPopulation = parseInt(data.studentPopulation) || null
+  // Remove undefined/empty string fields
+  Object.keys(data).forEach(k => { if (data[k] === '') data[k] = null })
   const university = await prisma.university.update({
     where: { id: req.params.id },
-    data: req.body,
+    data,
   })
   return successResponse(res, university, 'University updated')
 }
