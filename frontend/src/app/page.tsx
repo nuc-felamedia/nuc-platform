@@ -276,7 +276,7 @@ export default async function HomePage() {
             <h2 style={{fontSize: 'clamp(22px, 2.5vw, 30px)', fontWeight: 800, color: 'white', marginBottom: 24, lineHeight: 1.3}}>
               National Universities Commission Headquarters
             </h2>
-            <div style={{space: 16}}>
+            <div style={{display: 'flex', flexDirection: 'column', gap: 0}}>
               {[
                 { icon: '📍', label: 'Address', value: 'Plot 430, Aguiyi Ironsi Street, Maitama District, Abuja, FCT' },
                 { icon: '✉️', label: 'Email', value: 'info@nuc.edu.ng' },
