@@ -14,7 +14,7 @@ async function getHomeData() {
     return {
       stats: statsData.data,
       posts: postsData.data || [],
-      carousel: carouselData.data?.carousel_slides ? JSON.parse(carouselData.data.carousel_slides) : [],
+      carousel: carouselData.data?.value ? JSON.parse(carouselData.data.value) : [],
     }
   } catch {
     return { stats: null, posts: [], carousel: [] }

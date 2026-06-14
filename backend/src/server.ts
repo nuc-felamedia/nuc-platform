@@ -80,6 +80,15 @@ app.use('/api/v1/api-keys', apiKeyRoutes)
 // ── Error Handling ──
 app.use(notFound)
 // Public settings endpoint
+app.get('/api/v1/settings/carousel', async (req, res) => {
+  try {
+    const setting = await prisma.siteSetting.findUnique({ where: { key: 'carousel_slides' } })
+    res.json({ success: true, data: setting ? JSON.parse(setting.value) : [] })
+  } catch (e) {
+    res.json({ success: true, data: [] })
+  }
+})
+
 app.get('/api/v1/settings/announcement', async (req, res) => {
   try {
     const setting = await prisma.siteSetting.findUnique({ where: { key: 'announcement' } })
