@@ -39,6 +39,44 @@ function Field({ label, value, onChange, placeholder, type = 'text', multiline =
   )
 }
 
+function ImageUpload({ value, onChange, label }: { value: string; onChange: (url: string) => void; label: string }) {
+  const [uploading, setUploading] = useState(false)
+
+  async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (file.size > 2 * 1024 * 1024) { alert('Image must be under 2MB'); return }
+    setUploading(true)
+    const reader = new FileReader()
+    reader.onload = () => {
+      onChange(reader.result as string)
+      setUploading(false)
+    }
+    reader.readAsDataURL(file)
+  }
+
+  return (
+    <div style={{ marginBottom: 14 }}>
+      <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 5 }}>{label}</label>
+      <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+        {value && (
+          <img src={value} alt="preview" style={{ width: 64, height: 64, borderRadius: 10, objectFit: 'cover', border: '1px solid #e5e7eb', flexShrink: 0 }} />
+        )}
+        <div style={{ flex: 1 }}>
+          <input type="text" value={value} onChange={e => onChange(e.target.value)}
+            placeholder="Paste image URL or upload below"
+            style={{ width: '100%', padding: '8px 12px', border: '1px solid #e5e7eb', borderRadius: 8, fontSize: 13, marginBottom: 6, boxSizing: 'border-box' }} />
+          <label style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '6px 12px', background: '#f3f4f6', border: '1px solid #e5e7eb', borderRadius: 8, fontSize: 12, cursor: 'pointer', fontWeight: 500 }}>
+            {uploading ? 'Uploading...' : '📁 Upload photo'}
+            <input type="file" accept="image/*" onChange={handleFile} style={{ display: 'none' }} />
+          </label>
+          <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 4 }}>Max 2MB. JPG, PNG supported.</div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function SaveBtn({ onClick, loading, label = 'Save' }: any) {
   return (
     <button onClick={onClick} disabled={loading} style={{ background: loading ? '#93c5fd' : '#1d4ed8', color: '#fff', border: 'none', borderRadius: 8, padding: '10px 20px', fontSize: 13, fontWeight: 600, cursor: loading ? 'not-allowed' : 'pointer', width: '100%' }}>
@@ -303,10 +341,7 @@ function DirectorateModal({ directorate, onClose, onSaved }: { directorate: Dire
         <Field label="Director name" value={directorName} onChange={setDirectorName} placeholder="Prof. John Doe" />
         <Field label="Director title" value={directorTitle} onChange={setDirectorTitle} placeholder="Director of Academic Planning" />
         <Field label="Director email" value={directorEmail} onChange={setDirectorEmail} placeholder="director@nuc.edu.ng" type="email" />
-        <Field label="Director photo URL" value={directorPhotoUrl} onChange={setDirectorPhotoUrl} placeholder="https://example.com/photo.jpg" />
-        {directorPhotoUrl && (
-          <img src={directorPhotoUrl} alt="Director" style={{ width: 80, height: 80, borderRadius: 12, objectFit: 'cover', marginBottom: 12, border: '1px solid #e5e7eb' }} />
-        )}
+        <ImageUpload label="Director photo" value={directorPhotoUrl} onChange={setDirectorPhotoUrl} />
       </div>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 14px', background: '#f9fafb', borderRadius: 8, marginBottom: 16 }}>
         <div style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>Active</div>
