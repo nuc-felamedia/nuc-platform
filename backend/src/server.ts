@@ -78,7 +78,6 @@ app.use('/api/v1/admin', adminRoutes)
 app.use('/api/v1/api-keys', apiKeyRoutes)
 
 // ── Error Handling ──
-app.use(notFound)
 // Public settings endpoint
 app.get('/api/v1/settings/carousel', async (req, res) => {
   try {
@@ -98,6 +97,7 @@ app.get('/api/v1/settings/announcement', async (req, res) => {
   }
 })
 
+app.use(notFound)
 app.use(errorHandler)
 
 app.listen(PORT, () => {
