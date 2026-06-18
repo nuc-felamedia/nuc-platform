@@ -1,28 +1,25 @@
 import Link from 'next/link'
 import PublicLayout from '@/components/layout/PublicLayout'
-import { ArrowRight, Building2, CheckCircle, FileText, Globe, Users, BookOpen, ChevronRight } from 'lucide-react'
-import HeroCarousel from '@/components/layout/HeroCarousel'
+import { ArrowRight, Building2, CheckCircle, FileText, Globe, Users, BookOpen } from 'lucide-react'
 
 async function getHomeData() {
   try {
     const API = process.env.NEXT_PUBLIC_API_URL || 'https://nuc-platform-production.up.railway.app'
-    const [statsData, postsData, carouselData] = await Promise.all([
+    const [statsData, postsData] = await Promise.all([
       fetch(`${API}/api/v1/stats`, { cache: 'no-store' }).then(r => r.json()),
       fetch(`${API}/api/v1/posts?limit=3&status=PUBLISHED&type=NEWS`, { cache: 'no-store' }).then(r => r.json()),
-      fetch(`${API}/api/v1/settings/announcement`, { cache: 'no-store' }).then(r => r.json()).catch(() => ({ data: null })),
     ])
     return {
       stats: statsData.data,
       posts: postsData.data || [],
-      carousel: carouselData.data?.value ? JSON.parse(carouselData.data.value) : [],
     }
   } catch {
-    return { stats: null, posts: [], carousel: [] }
+    return { stats: null, posts: [] }
   }
 }
 
 export default async function HomePage() {
-  const { stats, posts, carousel } = await getHomeData()
+  const { stats, posts } = await getHomeData()
 
   const STAT_ITEMS = [
     { label: 'Total Universities', value: stats?.totalUniversities || 309, href: '/universities' },
@@ -42,10 +39,52 @@ export default async function HomePage() {
 
   return (
     <PublicLayout>
-      {/* ── HERO CAROUSEL ── */}
-      <HeroCarousel slides={carousel} />
 
-      {/* ── STATS BAR ── */}
+      {/* HERO */}
+      <section style={{
+        background: '#013220',
+        backgroundImage: 'url(https://www.nuc.edu.ng/wp-content/uploads/2025/06/MNM_3044.jpg)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        position: 'relative',
+        minHeight: 520,
+        display: 'flex',
+        alignItems: 'center',
+      }}>
+        <div style={{position: 'absolute', inset: 0, background: 'linear-gradient(to right, rgba(1,50,32,0.93) 0%, rgba(1,50,32,0.72) 55%, transparent 100%)'}} />
+        <div style={{position: 'relative', zIndex: 1, maxWidth: 1200, margin: '0 auto', padding: '80px 32px', width: '100%'}}>
+          <div style={{maxWidth: 600}}>
+            <div style={{fontSize: 11, fontWeight: 700, color: '#86efac', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 16}}>
+              National Universities Commission
+            </div>
+            <h1 style={{fontSize: 'clamp(28px, 4vw, 52px)', fontWeight: 800, color: 'white', lineHeight: 1.15, marginBottom: 20}}>
+              Ensuring Quality in Nigerian University Education
+            </h1>
+            <p style={{color: '#bbf7d0', fontSize: 17, lineHeight: 1.75, marginBottom: 36, maxWidth: 520}}>
+              Regulating 309 universities, accrediting 5,357 programmes, and protecting the integrity of Nigerian degrees since 1962.
+            </p>
+            <div style={{display: 'flex', gap: 12, flexWrap: 'wrap'}}>
+              <Link href="/universities" style={{
+                display: 'inline-flex', alignItems: 'center', gap: 6,
+                background: 'white', color: '#14532d', fontWeight: 700,
+                padding: '13px 26px', borderRadius: 12, fontSize: 14, textDecoration: 'none',
+              }}>
+                Explore Universities
+              </Link>
+              <Link href="/accreditation/verify" style={{
+                display: 'inline-flex', alignItems: 'center', gap: 6,
+                border: '1.5px solid rgba(255,255,255,0.4)', color: 'white', fontWeight: 500,
+                padding: '13px 26px', borderRadius: 12, fontSize: 14, textDecoration: 'none',
+                backdropFilter: 'blur(4px)',
+              }}>
+                Verify a programme
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* STATS BAR */}
       <section style={{background: '#052e16', borderBottom: '1px solid #14532d'}}>
         <div style={{maxWidth: 1200, margin: '0 auto', padding: '0 24px'}}>
           <div style={{display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)'}}>
@@ -63,7 +102,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── ES SECTION ── */}
+      {/* ES SECTION */}
       <section style={{background: 'white', borderBottom: '1px solid #f1f5f9', padding: '64px 24px'}}>
         <div style={{maxWidth: 1100, margin: '0 auto', display: 'flex', flexDirection: 'row', gap: 56, alignItems: 'center', flexWrap: 'wrap'}}>
           <div style={{flexShrink: 0}}>
@@ -83,9 +122,9 @@ export default async function HomePage() {
             <Link href="/about/executive-secretary" style={{
               display: 'inline-flex', alignItems: 'center', gap: 8,
               background: '#15803d', color: 'white', fontWeight: 700,
-              padding: '12px 24px', borderRadius: 12, fontSize: 14, textDecoration: 'none'
+              padding: '12px 24px', borderRadius: 12, fontSize: 14, textDecoration: 'none',
             }}>
-              Read full profile →
+              Read full profile
             </Link>
             <div style={{marginTop: 20, fontSize: 13, color: '#9ca3af'}}>
               Plot 430, Aguiyi Ironsi Street, Maitama District, Abuja, FCT · info@nuc.edu.ng · www.nuc.edu.ng
@@ -94,7 +133,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── LATEST NEWS ── */}
+      {/* LATEST NEWS */}
       {posts.length > 0 && (
         <section style={{background: '#f8fafc', borderBottom: '1px solid #e2e8f0', padding: '64px 24px'}}>
           <div style={{maxWidth: 1100, margin: '0 auto'}}>
@@ -126,7 +165,7 @@ export default async function HomePage() {
                           <img src="/nuc-logo.png" alt="NUC" style={{height: 60, opacity: 0.15}} />
                         </div>
                       )}
-                      <div style={{position: 'absolute', top: 12, right: 12, background: 'white/90', backdropFilter: 'blur(4px)', padding: '2px 8px', borderRadius: 8, fontSize: 11, fontWeight: 600, color: '#374151'}}>
+                      <div style={{position: 'absolute', top: 12, right: 12, background: 'white', backdropFilter: 'blur(4px)', padding: '2px 8px', borderRadius: 8, fontSize: 11, fontWeight: 600, color: '#374151'}}>
                         {post.publishedAt ? new Date(post.publishedAt).getFullYear() : ''}
                       </div>
                     </div>
@@ -154,7 +193,7 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* ── KEY SERVICES ── */}
+      {/* KEY SERVICES */}
       <section style={{background: 'white', borderBottom: '1px solid #f1f5f9', padding: '64px 24px'}}>
         <div style={{maxWidth: 1100, margin: '0 auto'}}>
           <div style={{textAlign: 'center', marginBottom: 48}}>
@@ -193,7 +232,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── ACCREDITATION OVERVIEW ── */}
+      {/* ACCREDITATION OVERVIEW */}
       {stats && (
         <section style={{background: '#052e16', padding: '64px 24px'}}>
           <div style={{maxWidth: 1100, margin: '0 auto'}}>
@@ -205,7 +244,7 @@ export default async function HomePage() {
                 </h2>
                 <p style={{color: '#86efac', fontSize: 15, marginBottom: 28}}>{(stats.totalPrograms || 0).toLocaleString()} programs assessed across all Nigerian universities</p>
                 <Link href="/accreditation" style={{display: 'inline-flex', alignItems: 'center', gap: 8, background: 'white', color: '#14532d', fontWeight: 700, padding: '12px 24px', borderRadius: 12, fontSize: 14, textDecoration: 'none'}}>
-                  View full results →
+                  View full results
                 </Link>
               </div>
               <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, flex: 1, minWidth: 260, maxWidth: 420}}>
@@ -226,7 +265,7 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* ── ABOUT NUC ── */}
+      {/* ABOUT NUC */}
       <section style={{background: '#f8fafc', padding: '64px 24px'}}>
         <div style={{maxWidth: 1100, margin: '0 auto'}}>
           <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 48, alignItems: 'center'}}>
@@ -243,7 +282,7 @@ export default async function HomePage() {
               </p>
               <div style={{display: 'flex', gap: 12, flexWrap: 'wrap'}}>
                 <Link href="/about" style={{display: 'inline-flex', alignItems: 'center', gap: 8, background: '#15803d', color: 'white', fontWeight: 700, padding: '12px 24px', borderRadius: 12, fontSize: 14, textDecoration: 'none'}}>
-                  About NUC →
+                  About NUC
                 </Link>
                 <Link href="/directorates" style={{display: 'inline-flex', alignItems: 'center', gap: 8, border: '1.5px solid #d1fae5', color: '#15803d', fontWeight: 600, padding: '12px 24px', borderRadius: 12, fontSize: 14, textDecoration: 'none'}}>
                   Our directorates
@@ -267,10 +306,9 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── FIND US ── */}
+      {/* FIND US */}
       <section style={{background: '#052e16', padding: '0', overflow: 'hidden'}}>
         <div style={{maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))'}}>
-          {/* Contact info */}
           <div style={{padding: '56px 40px', display: 'flex', flexDirection: 'column', justifyContent: 'center'}}>
             <div style={{fontSize: 11, fontWeight: 700, color: '#86efac', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12}}>Find us</div>
             <h2 style={{fontSize: 'clamp(22px, 2.5vw, 30px)', fontWeight: 800, color: 'white', marginBottom: 24, lineHeight: 1.3}}>
@@ -294,14 +332,13 @@ export default async function HomePage() {
             </div>
             <div style={{display: 'flex', gap: 12, marginTop: 24, flexWrap: 'wrap'}}>
               <Link href="/contact" style={{display: 'inline-flex', alignItems: 'center', gap: 8, background: 'white', color: '#14532d', fontWeight: 700, padding: '12px 24px', borderRadius: 12, fontSize: 14, textDecoration: 'none'}}>
-                Contact us →
+                Contact us
               </Link>
               <Link href="/auth/register" style={{display: 'inline-flex', alignItems: 'center', gap: 8, border: '1.5px solid rgba(255,255,255,0.3)', color: 'white', fontWeight: 600, padding: '12px 24px', borderRadius: 12, fontSize: 14, textDecoration: 'none'}}>
                 Create account
               </Link>
             </div>
           </div>
-          {/* Map */}
           <div style={{minHeight: 400, position: 'relative', overflow: 'hidden'}}>
             <iframe
               src="https://maps.google.com/maps?q=National+Universities+Commission+Maitama+Abuja&output=embed"
@@ -311,11 +348,12 @@ export default async function HomePage() {
               title="NUC Location"
             />
             <div style={{position: 'absolute', top: 16, left: 16, background: '#052e16', color: 'white', padding: '8px 14px', borderRadius: 10, fontSize: 12, fontWeight: 600, boxShadow: '0 4px 12px rgba(0,0,0,0.3)'}}>
-              📍 NUC Headquarters, Maitama, Abuja
+              NUC Headquarters, Maitama, Abuja
             </div>
           </div>
         </div>
       </section>
+
     </PublicLayout>
   )
 }
