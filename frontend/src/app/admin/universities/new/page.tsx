@@ -17,7 +17,13 @@ export default function NewUniversityPage() {
   })
 
   const mutation = useMutation({
-    mutationFn: (data: any) => universitiesApi.create(data),
+    mutationFn: (data: any) => {
+      const clean = { ...data }
+      if (clean.yearEstablished) clean.yearEstablished = parseInt(clean.yearEstablished) || null
+      if (clean.studentPopulation) clean.studentPopulation = parseInt(clean.studentPopulation) || null
+      Object.keys(clean).forEach(k => { if (clean[k] === '') clean[k] = null })
+      return universitiesApi.create(clean)
+    },
     onSuccess: () => {
       toast.success('University created successfully')
       queryClient.invalidateQueries({ queryKey: ['admin-universities'] })

@@ -90,6 +90,9 @@ export async function getUniversity(req: Request, res: Response) {
 
 export async function createUniversity(req: Request, res: Response) {
   const { name, ...rest } = req.body
+  if (rest.yearEstablished) rest.yearEstablished = parseInt(rest.yearEstablished) || null
+  if (rest.studentPopulation) rest.studentPopulation = parseInt(rest.studentPopulation) || null
+  Object.keys(rest).forEach(k => { if (rest[k] === '') rest[k] = null })
   const university = await prisma.university.create({
     data: { name, slug: slug(name), ...rest },
   })
