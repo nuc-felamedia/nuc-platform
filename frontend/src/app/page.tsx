@@ -1,17 +1,20 @@
 import Link from 'next/link'
+import HeroCarousel from '@/components/layout/HeroCarousel'
 import PublicLayout from '@/components/layout/PublicLayout'
 import { ArrowRight, Building2, CheckCircle, FileText, Globe, Users, BookOpen } from 'lucide-react'
 
 async function getHomeData() {
   try {
     const API = process.env.NEXT_PUBLIC_API_URL || 'https://nuc-platform-production.up.railway.app'
-    const [statsData, postsData] = await Promise.all([
+    const [statsData, postsData, carouselRes] = await Promise.all([
       fetch(`${API}/api/v1/stats`, { cache: 'no-store' }).then(r => r.json()),
       fetch(`${API}/api/v1/posts?limit=3&status=PUBLISHED&type=NEWS`, { cache: 'no-store' }).then(r => r.json()),
+      fetch(`${API}/api/v1/settings/carousel`, { cache: 'no-store' }).then(r => r.json()).catch(() => ({ data: [] })),
     ])
     return {
       stats: statsData.data,
       posts: postsData.data || [],
+      carousel: carouselRes?.data || [],
     }
   } catch {
     return { stats: null, posts: [] }
@@ -19,7 +22,7 @@ async function getHomeData() {
 }
 
 export default async function HomePage() {
-  const { stats, posts } = await getHomeData()
+  const { stats, posts, carousel } = await getHomeData()
 
   const STAT_ITEMS = [
     { label: 'Total Universities', value: stats?.totalUniversities || 309, href: '/universities' },
@@ -41,48 +44,7 @@ export default async function HomePage() {
     <PublicLayout>
 
       {/* HERO */}
-      <section style={{
-        background: '#013220',
-        backgroundImage: 'url(https://www.nuc.edu.ng/wp-content/uploads/2025/06/MNM_3044.jpg)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        position: 'relative',
-        minHeight: 520,
-        display: 'flex',
-        alignItems: 'center',
-      }}>
-        <div style={{position: 'absolute', inset: 0, background: 'linear-gradient(to right, rgba(1,50,32,0.93) 0%, rgba(1,50,32,0.72) 55%, transparent 100%)'}} />
-        <div style={{position: 'relative', zIndex: 1, maxWidth: 1200, margin: '0 auto', padding: '80px 32px', width: '100%'}}>
-          <div style={{maxWidth: 600}}>
-            <div style={{fontSize: 11, fontWeight: 700, color: '#86efac', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 16}}>
-              National Universities Commission
-            </div>
-            <h1 style={{fontSize: 'clamp(28px, 4vw, 52px)', fontWeight: 800, color: 'white', lineHeight: 1.15, marginBottom: 20}}>
-              Ensuring Quality in Nigerian University Education
-            </h1>
-            <p style={{color: '#bbf7d0', fontSize: 17, lineHeight: 1.75, marginBottom: 36, maxWidth: 520}}>
-              Regulating 309 universities, accrediting 5,357 programmes, and protecting the integrity of Nigerian degrees since 1962.
-            </p>
-            <div style={{display: 'flex', gap: 12, flexWrap: 'wrap'}}>
-              <Link href="/universities" style={{
-                display: 'inline-flex', alignItems: 'center', gap: 6,
-                background: 'white', color: '#14532d', fontWeight: 700,
-                padding: '13px 26px', borderRadius: 12, fontSize: 14, textDecoration: 'none',
-              }}>
-                Explore Universities
-              </Link>
-              <Link href="/accreditation/verify" style={{
-                display: 'inline-flex', alignItems: 'center', gap: 6,
-                border: '1.5px solid rgba(255,255,255,0.4)', color: 'white', fontWeight: 500,
-                padding: '13px 26px', borderRadius: 12, fontSize: 14, textDecoration: 'none',
-                backdropFilter: 'blur(4px)',
-              }}>
-                Verify a programme
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
+      <HeroCarousel slides={carousel} />
 
       {/* STATS BAR */}
       <section style={{background: '#052e16', borderBottom: '1px solid #14532d'}}>
