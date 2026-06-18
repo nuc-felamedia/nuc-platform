@@ -83,13 +83,16 @@ export async function createDirectorate(req: Request, res: Response) {
 }
 
 export async function updateDirectorate(req: Request, res: Response) {
-  const { name, mandate, directorName, directorTitle, directorEmail, order, isActive } = req.body
+  const { name, mandate, description, vision, directorName, directorTitle, directorEmail, directorPhotoUrl, order, isActive } = req.body
   const data: any = {}
   if (name !== undefined) { data.name = name; data.slug = slug(name) }
   if (mandate !== undefined) data.mandate = mandate
+  if (description !== undefined) data.description = description
+  if (vision !== undefined) data.vision = vision
   if (directorName !== undefined) data.directorName = directorName
   if (directorTitle !== undefined) data.directorTitle = directorTitle
   if (directorEmail !== undefined) data.directorEmail = directorEmail
+  if (directorPhotoUrl !== undefined) data.directorPhotoUrl = directorPhotoUrl
   if (order !== undefined) data.order = order
   if (isActive !== undefined) data.isActive = isActive
   const d = await prisma.directorate.update({ where: { id: req.params.id }, data })
